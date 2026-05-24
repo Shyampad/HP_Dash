@@ -1,2 +1,2 @@
-# HP_Dash
+# index.html
 HP Dash demo
