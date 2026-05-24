@@ -1,783 +1,361 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HP Laptop — Sales Intelligence Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<style>
-  :root {
-    --hp-blue: #0096D6;
-    --hp-dark: #00568B;
-    --hp-navy: #001F3F;
-    --accent: #00D4FF;
-    --success: #00C896;
-    --warning: #FFB800;
-    --danger: #FF4757;
-    --bg: #F0F4F8;
-    --surface: #FFFFFF;
-    --border: #E2ECF4;
-    --text: #1A2B3C;
-    --muted: #6B8299;
-    --sidebar-w: 230px;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; }
 
-  /* SIDEBAR */
-  .sidebar {
-    width:var(--sidebar-w); min-height:100vh; background:var(--hp-navy);
-    display:flex; flex-direction:column; position:fixed; top:0; left:0; z-index:100;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.18);
-  }
-  .sidebar-logo {
-    padding:28px 24px 20px;
-    border-bottom:1px solid rgba(255,255,255,0.08);
-  }
-  .sidebar-logo .logo-text { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:#fff; letter-spacing:-0.5px; }
-  .sidebar-logo .logo-sub { font-size:11px; color:rgba(255,255,255,0.45); letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; }
-  .nav-section { padding:18px 0 4px; }
-  .nav-label { font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:2px; text-transform:uppercase; padding:0 24px 8px; }
-  .nav-item {
-    display:flex; align-items:center; gap:10px; padding:11px 24px;
-    color:rgba(255,255,255,0.55); font-size:13.5px; font-weight:500;
-    cursor:pointer; transition:all 0.2s; border-left:3px solid transparent;
-    text-decoration:none;
-  }
-  .nav-item:hover { color:#fff; background:rgba(255,255,255,0.06); }
-  .nav-item.active { color:#fff; background:rgba(0,150,214,0.18); border-left:3px solid var(--hp-blue); }
-  .nav-item .icon { font-size:16px; width:20px; text-align:center; }
-  .sidebar-footer { margin-top:auto; padding:20px 24px; border-top:1px solid rgba(255,255,255,0.08); }
-  .sidebar-footer .tag { font-size:11px; color:rgba(255,255,255,0.3); }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  /* MAIN */
-  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+  <title>HP E-commerce Dashboard</title>
 
-  /* TOPBAR */
-  .topbar {
-    background:var(--surface); padding:16px 32px; display:flex; align-items:center;
-    justify-content:space-between; border-bottom:1px solid var(--border);
-    position:sticky; top:0; z-index:50;
-  }
-  .topbar-title { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:var(--text); }
-  .topbar-title span { color:var(--hp-blue); }
-  .topbar-right { display:flex; align-items:center; gap:12px; }
-  .filter-badge {
-    background:var(--bg); border:1px solid var(--border); border-radius:8px;
-    padding:7px 14px; font-size:12px; color:var(--muted); cursor:pointer; display:flex; align-items:center; gap:6px;
-  }
-  .filter-badge select { border:none; background:transparent; font-size:12px; color:var(--text); outline:none; cursor:pointer; }
-  .live-dot { width:8px; height:8px; background:var(--success); border-radius:50%; animation:pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
-  .live-text { font-size:12px; color:var(--success); font-weight:500; }
+  <script src="https://cdn.tailwindcss.com"></script>
 
-  /* CONTENT */
-  .content { padding:28px 32px; flex:1; }
-  .page { display:none; }
-  .page.active { display:block; }
-
-  /* KPI CARDS */
-  .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:24px; }
-  .kpi-card {
-    background:var(--surface); border-radius:14px; padding:20px;
-    border:1px solid var(--border); position:relative; overflow:hidden;
-    transition:transform 0.2s, box-shadow 0.2s;
-  }
-  .kpi-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.08); }
-  .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--accent-color, var(--hp-blue)); border-radius:14px 14px 0 0; }
-  .kpi-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
-  .kpi-value { font-family:'Syne',sans-serif; font-size:26px; font-weight:800; color:var(--text); line-height:1; }
-  .kpi-change { font-size:12px; margin-top:6px; display:flex; align-items:center; gap:4px; }
-  .kpi-change.up { color:var(--success); }
-  .kpi-change.down { color:var(--danger); }
-  .kpi-icon { position:absolute; right:16px; top:16px; font-size:22px; opacity:0.15; }
-
-  /* CHART PANELS */
-  .chart-grid { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:24px; }
-  .chart-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:24px; }
-  .chart-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
-  .panel {
-    background:var(--surface); border-radius:14px; padding:22px;
-    border:1px solid var(--border);
-  }
-  .panel-full { grid-column:1/-1; }
-  .panel-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px; }
-  .panel-sub { font-size:12px; color:var(--muted); margin-bottom:18px; }
-  .chart-wrap { position:relative; }
-
-  /* FUNNEL */
-  .funnel-wrap { display:flex; flex-direction:column; gap:8px; padding:8px 0; }
-  .funnel-step { display:flex; align-items:center; gap:16px; }
-  .funnel-bar-wrap { flex:1; background:var(--bg); border-radius:8px; height:44px; overflow:hidden; position:relative; }
-  .funnel-bar { height:100%; border-radius:8px; display:flex; align-items:center; padding-left:16px; transition:width 1s ease; }
-  .funnel-bar-label { font-size:13px; font-weight:600; color:#fff; }
-  .funnel-meta { min-width:120px; text-align:right; }
-  .funnel-meta .val { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; }
-  .funnel-meta .pct { font-size:11px; color:var(--muted); }
-  .funnel-step-label { min-width:110px; font-size:13px; font-weight:500; color:var(--text); }
-  .funnel-connector { width:3px; height:12px; background:var(--border); margin-left:55px; }
-
-  /* TABLE */
-  .table-wrap { overflow-x:auto; }
-  table { width:100%; border-collapse:collapse; font-size:13px; }
-  th { font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:var(--muted); padding:10px 14px; text-align:left; border-bottom:2px solid var(--border); }
-  td { padding:12px 14px; border-bottom:1px solid var(--border); }
-  tr:last-child td { border-bottom:none; }
-  tr:hover td { background:#F7FBFF; }
-  .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
-  .badge-green { background:#E6FAF4; color:#00A87A; }
-  .badge-red { background:#FFEEF0; color:#D63031; }
-  .badge-yellow { background:#FFF8E1; color:#F0A500; }
-  .badge-blue { background:#E3F4FD; color:#0096D6; }
-  .progress-mini { height:6px; background:var(--bg); border-radius:10px; overflow:hidden; margin-top:4px; }
-  .progress-fill { height:100%; border-radius:10px; }
-
-  /* SECTION HEADER */
-  .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
-  .section-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--text); }
-  .section-desc { font-size:13px; color:var(--muted); margin-top:3px; }
-  .btn { padding:9px 18px; border-radius:9px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.2s; }
-  .btn-primary { background:var(--hp-blue); color:#fff; }
-  .btn-primary:hover { background:var(--hp-dark); }
-  .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
-
-  /* ROOT CAUSE */
-  .rca-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:24px; }
-  .rca-card { background:var(--surface); border-radius:14px; padding:20px; border:1px solid var(--border); }
-  .rca-card-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
-  .rca-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
-  .rca-card-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; }
-  .metric-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); }
-  .metric-row:last-child { border-bottom:none; }
-  .metric-name { font-size:12.5px; color:var(--muted); }
-  .metric-val { font-size:13px; font-weight:600; }
-  .metric-trend { font-size:11px; }
-  .trend-up { color:var(--success); }
-  .trend-down { color:var(--danger); }
-
-  /* CITY MAP VISUAL */
-  .city-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
-  .city-card {
-    background:var(--surface); border:1px solid var(--border); border-radius:12px;
-    padding:16px; text-align:center; transition:all 0.2s; cursor:pointer;
-  }
-  .city-card:hover { border-color:var(--hp-blue); box-shadow:0 4px 16px rgba(0,150,214,0.12); }
-  .city-name { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; margin-bottom:6px; }
-  .city-units { font-size:22px; font-weight:800; color:var(--hp-blue); }
-  .city-rev { font-size:12px; color:var(--muted); margin-top:2px; }
-  .city-bar { height:4px; background:var(--bg); border-radius:4px; margin-top:10px; overflow:hidden; }
-  .city-bar-fill { height:100%; background:linear-gradient(90deg,var(--hp-blue),var(--accent)); border-radius:4px; }
-
-  /* INSIGHT PILLS */
-  .insight-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
-  .insight-pill {
-    background:var(--surface); border:1px solid var(--border); border-radius:10px;
-    padding:10px 16px; font-size:13px; display:flex; align-items:center; gap:8px;
-    flex:1; min-width:200px;
-  }
-  .insight-pill .i-icon { font-size:18px; }
-  .insight-pill .i-text strong { display:block; font-size:13px; font-weight:600; }
-  .insight-pill .i-text span { font-size:11px; color:var(--muted); }
-
-  /* TABS */
-  .tabs { display:flex; gap:0; margin-bottom:20px; background:var(--bg); border-radius:10px; padding:4px; width:fit-content; }
-  .tab { padding:8px 18px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; color:var(--muted); transition:all 0.2s; }
-  .tab.active { background:var(--surface); color:var(--text); font-weight:600; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
-
-  /* AVAILABILITY */
-  .avail-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; }
-  .avail-card { background:var(--surface); border-radius:12px; padding:16px; border:1px solid var(--border); }
-  .avail-sku { font-size:12px; color:var(--muted); margin-bottom:4px; }
-  .avail-name { font-size:14px; font-weight:600; margin-bottom:10px; }
-  .avail-stock { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-  .stock-val { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; }
-  .stock-pct { font-size:12px; }
-
-  @media(max-width:900px){
-    .chart-grid,.chart-grid-3,.chart-grid-2,.rca-grid{grid-template-columns:1fr;}
-    .sidebar{transform:translateX(-100%);} .main{margin-left:0;}
-  }
-</style>
 </head>
-<body>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-text">HP Analytics</div>
-    <div class="logo-sub">Sales Intelligence</div>
+<body class="bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 min-h-screen p-6">
+
+  <div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- HEADER -->
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+
+      <div>
+
+        <h1 class="text-5xl font-bold text-gray-900">
+          HP E-commerce Dashboard
+        </h1>
+
+        <p class="text-gray-700 mt-3 text-lg">
+          Estimated Metrics - April 2026
+        </p>
+
+      </div>
+
+      <!-- COUNTRY FILTER -->
+
+      <div class="mt-5 md:mt-0">
+
+        <select id="countryFilter"
+          class="px-5 py-3 rounded-2xl border border-gray-300 bg-white text-gray-800 shadow-xl font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300">
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <!-- KPI CARDS -->
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
+
+      <div
+        class="bg-gradient-to-br from-white to-blue-50 rounded-3xl shadow-2xl p-6 border border-white/50 hover:scale-105 transition-all duration-300">
+
+        <p class="text-gray-500 font-medium">
+          Estimated Revenue
+        </p>
+
+        <h2 id="revenue" class="text-3xl font-bold mt-3 text-blue-700">
+          $579M <span class="text-green-600 text-lg">(YoY ↑ 12%)</span>
+        </h2>
+
+      </div>
+
+      <div
+        class="bg-gradient-to-br from-white to-green-50 rounded-3xl shadow-2xl p-6 border border-white/50 hover:scale-105 transition-all duration-300">
+
+        <p class="text-gray-500 font-medium">
+          Units Sold
+        </p>
+
+        <h2 id="units" class="text-3xl font-bold mt-3 text-green-700">
+          751K <span class="text-green-600 text-lg">(YoY ↑ 9%)</span>
+        </h2>
+
+      </div>
+
+      <div
+        class="bg-gradient-to-br from-white to-purple-50 rounded-3xl shadow-2xl p-6 border border-white/50 hover:scale-105 transition-all duration-300">
+
+        <p class="text-gray-500 font-medium">
+          Impressions
+        </p>
+
+        <h2 id="impressions" class="text-3xl font-bold mt-3 text-purple-700">
+          150M <span class="text-green-600 text-lg">(YoY ↑ 18%)</span>
+        </h2>
+
+      </div>
+
+      <div
+        class="bg-gradient-to-br from-white to-pink-50 rounded-3xl shadow-2xl p-6 border border-white/50 hover:scale-105 transition-all duration-300">
+
+        <p class="text-gray-500 font-medium">
+          CTR
+        </p>
+
+        <h2 id="ctr" class="text-3xl font-bold mt-3 text-pink-700">
+          5.07% <span class="text-green-600 text-lg">(YoY ↑ 2.1%)</span>
+        </h2>
+
+      </div>
+
+      <div
+        class="bg-gradient-to-br from-white to-orange-50 rounded-3xl shadow-2xl p-6 border border-white/50 hover:scale-105 transition-all duration-300">
+
+        <p class="text-gray-500 font-medium">
+          CVR
+        </p>
+
+        <h2 id="cvr" class="text-3xl font-bold mt-3 text-orange-700">
+          1.62% <span class="text-red-500 text-lg">(YoY ↓ 0.4%)</span>
+        </h2>
+
+      </div>
+
+    </div>
+
+    <!-- COUNTRY PERFORMANCE -->
+
+    <div class="bg-white rounded-3xl shadow-2xl p-6">
+
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">
+        Country-wise Performance
+      </h2>
+
+      <div class="overflow-x-auto">
+
+        <table class="w-full text-left border-collapse">
+
+          <thead>
+
+            <tr class="border-b text-gray-600">
+
+              <th class="py-4">Country</th>
+              <th class="py-4">Visits</th>
+              <th class="py-4">Impressions</th>
+              <th class="py-4">CTR</th>
+              <th class="py-4">CVR</th>
+              <th class="py-4">Units</th>
+              <th class="py-4">Revenue</th>
+              <th class="py-4">Traffic Share %</th>
+              <th class="py-4">AOV</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="tableBody"></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+    <!-- PROMOTIONS -->
+
+    <div class="bg-white rounded-3xl shadow-2xl p-6">
+
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">
+        Promotions Active
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+
+        <div
+          class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-3xl p-5 shadow-lg hover:scale-105 transition-all">
+
+          <h3 class="text-xl font-bold">
+            Back to School
+          </h3>
+
+          <p class="text-sm mt-2 opacity-90">
+            Student discounts & laptop offers
+          </p>
+
+        </div>
+
+        <div
+          class="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-3xl p-5 shadow-lg hover:scale-105 transition-all">
+
+          <h3 class="text-xl font-bold">
+            No Cost EMI
+          </h3>
+
+          <p class="text-sm mt-2 opacity-90">
+            Cashback & EMI offers
+          </p>
+
+        </div>
+
+        <div
+          class="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-3xl p-5 shadow-lg hover:scale-105 transition-all">
+
+          <h3 class="text-xl font-bold">
+            Gaming Week
+          </h3>
+
+          <p class="text-sm mt-2 opacity-90">
+            OMEN & Victus sale
+          </p>
+
+        </div>
+
+        <div
+          class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-3xl p-5 shadow-lg hover:scale-105 transition-all">
+
+          <h3 class="text-xl font-bold">
+            Printer Bundles
+          </h3>
+
+          <p class="text-sm mt-2 opacity-90">
+            Free ink & warranty
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
-  <nav>
-    <div class="nav-section">
-      <div class="nav-label">Overview</div>
-      <a class="nav-item active" onclick="showPage('overview',this)">
-        <span class="icon">📊</span> KPI Overview
-      </a>
-      <a class="nav-item" onclick="showPage('funnel',this)">
-        <span class="icon">🔽</span> Digital Funnel
-      </a>
-    </div>
-    <div class="nav-section">
-      <div class="nav-label">Sales Analysis</div>
-      <a class="nav-item" onclick="showPage('sku',this)">
-        <span class="icon">💻</span> Sales by SKU
-      </a>
-      <a class="nav-item" onclick="showPage('city',this)">
-        <span class="icon">🏙️</span> City-wise Sales
-      </a>
-    </div>
-    <div class="nav-section">
-      <div class="nav-label">Diagnostics</div>
-      <a class="nav-item" onclick="showPage('rca',this)">
-        <span class="icon">🔍</span> Root Cause Analysis
-      </a>
-      <a class="nav-item" onclick="showPage('promo',this)">
-        <span class="icon">🏷️</span> Promotions & Availability
-      </a>
-    </div>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="tag">HP Inc. · India Market</div>
-    <div class="tag" style="margin-top:4px;">FY2025 · Sample Data</div>
-  </div>
-</aside>
 
-<!-- MAIN -->
-<div class="main">
-  <div class="topbar">
-    <div class="topbar-title"><span>HP Laptop</span> — Sales Dashboard</div>
-    <div class="topbar-right">
-      <div class="filter-badge">📅 <select><option>Last 30 Days</option><option>Last 90 Days</option><option>FY2025</option><option>FY2024</option></select></div>
-      <div class="filter-badge">🌏 <select><option>All India</option><option>North</option><option>South</option><option>East</option><option>West</option></select></div>
-      <div class="live-dot"></div><div class="live-text">Live</div>
-    </div>
-  </div>
+  <script>
 
-  <div class="content">
+    const data = [
 
-    <!-- PAGE 1: KPI OVERVIEW -->
-    <div class="page active" id="page-overview">
-      <div class="section-header">
-        <div>
-          <div class="section-title">KPI Overview</div>
-          <div class="section-desc">Traffic · Conversion · Revenue · ASP · Mix · Availability</div>
-        </div>
-        <button class="btn btn-primary">⬇ Export</button>
-      </div>
+      { country: "United States", visits: 13664700, impressions: 42000000, ctr: 5.2, cvr: 1.8, units: 245965, revenue: 196.8 },
 
-      <div class="kpi-grid">
-        <div class="kpi-card" style="--accent-color:#0096D6">
-          <div class="kpi-icon">👁️</div>
-          <div class="kpi-label">Total Traffic</div>
-          <div class="kpi-value">4.2M</div>
-          <div class="kpi-change up">▲ 12.4% vs last month</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#00C896">
-          <div class="kpi-icon">🎯</div>
-          <div class="kpi-label">Conversion Rate</div>
-          <div class="kpi-value">2.8%</div>
-          <div class="kpi-change down">▼ 0.3% vs last month</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#FFB800">
-          <div class="kpi-icon">💰</div>
-          <div class="kpi-label">Revenue (₹ Cr)</div>
-          <div class="kpi-value">₹284Cr</div>
-          <div class="kpi-change up">▲ 8.1% vs last month</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#FF4757">
-          <div class="kpi-icon">🏷️</div>
-          <div class="kpi-label">ASP (Avg Sell Price)</div>
-          <div class="kpi-value">₹62.4K</div>
-          <div class="kpi-change up">▲ 3.2% vs last month</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#A55EEA">
-          <div class="kpi-icon">📦</div>
-          <div class="kpi-label">Units Sold</div>
-          <div class="kpi-value">45,520</div>
-          <div class="kpi-change up">▲ 5.6% vs last month</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#00D4FF">
-          <div class="kpi-icon">✅</div>
-          <div class="kpi-label">Availability</div>
-          <div class="kpi-value">87.3%</div>
-          <div class="kpi-change down">▼ 2.1% vs last month</div>
-        </div>
-      </div>
+      { country: "India", visits: 4174120, impressions: 14000000, ctr: 4.8, cvr: 1.5, units: 62612, revenue: 40.7 },
 
-      <div class="chart-grid">
-        <div class="panel">
-          <div class="panel-title">Revenue & Units Trend</div>
-          <div class="panel-sub">Monthly performance — FY2025</div>
-          <div class="chart-wrap"><canvas id="revChart" height="90"></canvas></div>
-        </div>
-        <div class="panel">
-          <div class="panel-title">Sales Mix by Category</div>
-          <div class="panel-sub">Premium · Mid-range · Entry</div>
-          <div class="chart-wrap"><canvas id="mixChart" height="160"></canvas></div>
-        </div>
-      </div>
+      { country: "Japan", visits: 2790780, impressions: 9000000, ctr: 5.1, cvr: 1.6, units: 44652, revenue: 33.5 },
 
-      <div class="chart-grid-3">
-        <div class="panel">
-          <div class="panel-title">Traffic Sources</div>
-          <div class="panel-sub">Where visitors come from</div>
-          <canvas id="trafficChart" height="160"></canvas>
-        </div>
-        <div class="panel">
-          <div class="panel-title">Conversion by Device</div>
-          <div class="panel-sub">Mobile vs Desktop vs Tablet</div>
-          <canvas id="deviceChart" height="160"></canvas>
-        </div>
-        <div class="panel">
-          <div class="panel-title">Weekly Conversion Rate</div>
-          <div class="panel-sub">Last 8 weeks trend</div>
-          <canvas id="convChart" height="160"></canvas>
-        </div>
-      </div>
-    </div>
+      { country: "United Kingdom", visits: 1976200, impressions: 6500000, ctr: 5.0, cvr: 1.7, units: 33595, revenue: 26.9 },
 
-    <!-- PAGE 2: DIGITAL FUNNEL -->
-    <div class="page" id="page-funnel">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Digital Funnel</div>
-          <div class="section-desc">Impression → PDP View → Add to Cart → Checkout → Purchase</div>
-        </div>
-      </div>
+      { country: "Germany", visits: 1908720, impressions: 6200000, ctr: 4.9, cvr: 1.7, units: 32448, revenue: 25.9 },
 
-      <div class="chart-grid">
-        <div class="panel">
-          <div class="panel-title">HP Laptop — Full Funnel Performance</div>
-          <div class="panel-sub">India e-commerce channels · Last 30 days</div>
-          <div class="funnel-wrap" id="funnelViz"></div>
-        </div>
-        <div class="panel">
-          <div class="panel-title">Step-by-Step Drop-off</div>
-          <div class="panel-sub">Where users exit the funnel</div>
-          <canvas id="dropoffChart" height="200"></canvas>
-        </div>
-      </div>
+      { country: "Australia", visits: 1200000, impressions: 4000000, ctr: 5.1, cvr: 1.6, units: 19200, revenue: 15.2 },
 
-      <div class="chart-grid-2">
-        <div class="panel">
-          <div class="panel-title">Funnel by Channel</div>
-          <div class="panel-sub">Amazon vs Flipkart vs HP.com</div>
-          <canvas id="channelFunnelChart" height="180"></canvas>
-        </div>
-        <div class="panel">
-          <div class="panel-title">Conversion Rate Over Time</div>
-          <div class="panel-sub">Imp-to-Sale % — weekly</div>
-          <canvas id="convTimeChart" height="180"></canvas>
-        </div>
-      </div>
+      { country: "Canada", visits: 1450000, impressions: 4800000, ctr: 5.0, cvr: 1.7, units: 24650, revenue: 18.6 },
 
-      <div class="panel">
-        <div class="panel-title">Funnel Benchmarks — HP vs Market</div>
-        <div class="panel-sub">Publicly available industry benchmarks for PC category</div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Funnel Stage</th><th>HP India</th><th>Industry Avg</th><th>Best in Class</th><th>Gap</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr><td>Impression → PDP Click</td><td>3.2%</td><td>2.8%</td><td>4.5%</td><td>+0.4%</td><td><span class="badge badge-green">Above Avg</span></td></tr>
-              <tr><td>PDP → Add to Cart</td><td>8.4%</td><td>9.2%</td><td>14%</td><td>-0.8%</td><td><span class="badge badge-yellow">Below Avg</span></td></tr>
-              <tr><td>Add to Cart → Checkout</td><td>54%</td><td>58%</td><td>72%</td><td>-4%</td><td><span class="badge badge-yellow">Below Avg</span></td></tr>
-              <tr><td>Checkout → Purchase</td><td>71%</td><td>68%</td><td>80%</td><td>+3%</td><td><span class="badge badge-green">Above Avg</span></td></tr>
-              <tr><td><strong>Imp → Sale (End-to-End)</strong></td><td><strong>0.13%</strong></td><td><strong>0.10%</strong></td><td><strong>0.22%</strong></td><td><strong>+0.03%</strong></td><td><span class="badge badge-blue">On Track</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+      { country: "France", visits: 1100000, impressions: 3600000, ctr: 4.7, cvr: 1.5, units: 16500, revenue: 13.4 },
 
-    <!-- PAGE 3: SALES BY SKU -->
-    <div class="page" id="page-sku">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Sales by SKU</div>
-          <div class="section-desc">Product-level performance — HP Laptop portfolio</div>
-        </div>
-        <button class="btn btn-outline">🔍 Filter SKUs</button>
-      </div>
+      { country: "Italy", visits: 980000, impressions: 3200000, ctr: 4.8, cvr: 1.4, units: 13720, revenue: 11.8 },
 
-      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="kpi-card" style="--accent-color:#0096D6">
-          <div class="kpi-label">Total SKUs Tracked</div>
-          <div class="kpi-value">28</div>
-          <div class="kpi-change up">▲ 3 new this quarter</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#00C896">
-          <div class="kpi-label">Top SKU Revenue</div>
-          <div class="kpi-value">₹42Cr</div>
-          <div class="kpi-change">HP Pavilion 15</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#FF4757">
-          <div class="kpi-label">Declining SKUs</div>
-          <div class="kpi-value">6</div>
-          <div class="kpi-change down">▼ Need attention</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#FFB800">
-          <div class="kpi-label">Avg ASP (₹)</div>
-          <div class="kpi-value">₹62.4K</div>
-          <div class="kpi-change up">▲ 3.2% MoM</div>
-        </div>
-      </div>
+      { country: "Spain", visits: 920000, impressions: 3000000, ctr: 4.9, cvr: 1.5, units: 13800, revenue: 10.9 },
 
-      <div class="chart-grid">
-        <div class="panel">
-          <div class="panel-title">Top 8 SKUs by Revenue</div>
-          <div class="panel-sub">₹ Crore — Last 30 days</div>
-          <canvas id="skuBarChart" height="120"></canvas>
-        </div>
-        <div class="panel">
-          <div class="panel-title">SKU Mix — Units</div>
-          <div class="panel-sub">Share of units sold</div>
-          <canvas id="skuPieChart" height="200"></canvas>
-        </div>
-      </div>
+      { country: "Singapore", visits: 650000, impressions: 2200000, ctr: 5.4, cvr: 1.9, units: 12350, revenue: 9.7 },
 
-      <div class="panel">
-        <div class="panel-title">Full SKU Performance Table</div>
-        <div class="panel-sub">Revenue · Units · ASP · Conversion · Availability · Trend</div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>SKU / Model</th><th>Category</th><th>Units Sold</th><th>Revenue (₹Cr)</th><th>ASP (₹)</th><th>Conv%</th><th>Avail%</th><th>MoM</th></tr></thead>
-            <tbody id="skuTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+      { country: "Malaysia", visits: 540000, impressions: 1800000, ctr: 5.0, cvr: 1.5, units: 8100, revenue: 6.2 },
 
-    <!-- PAGE 4: CITY-WISE SALES -->
-    <div class="page" id="page-city">
-      <div class="section-header">
-        <div>
-          <div class="section-title">City-wise Sales Analytics</div>
-          <div class="section-desc">Product-wise & city-wise breakdown across India</div>
-        </div>
-      </div>
+      { country: "Thailand", visits: 510000, impressions: 1700000, ctr: 5.1, cvr: 1.4, units: 7140, revenue: 5.8 },
 
-      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="kpi-card" style="--accent-color:#0096D6">
-          <div class="kpi-label">#1 City</div>
-          <div class="kpi-value">Mumbai</div>
-          <div class="kpi-change up">▲ 14.2% growth</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#FF4757">
-          <div class="kpi-label">Fastest Growing</div>
-          <div class="kpi-value">Pune</div>
-          <div class="kpi-change up">▲ 31.4% growth</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#00C896">
-          <div class="kpi-label">Top ASP City</div>
-          <div class="kpi-value">Bengaluru</div>
-          <div class="kpi-change">Avg ₹74.2K</div>
-        </div>
-        <div class="kpi-card" style="--accent-color:#FFB800">
-          <div class="kpi-label">Cities Tracked</div>
-          <div class="kpi-value">24</div>
-          <div class="kpi-change">Tier 1 + Tier 2</div>
-        </div>
-      </div>
+      { country: "Saudi Arabia", visits: 600000, impressions: 2100000, ctr: 5.2, cvr: 1.6, units: 9600, revenue: 8.5 },
 
-      <div class="city-grid" id="cityCards"></div>
+      { country: "South Africa", visits: 450000, impressions: 1500000, ctr: 4.8, cvr: 1.3, units: 5850, revenue: 4.7 },
 
-      <div class="chart-grid" style="margin-top:20px">
-        <div class="panel">
-          <div class="panel-title">Top 10 Cities — Units Sold</div>
-          <div class="panel-sub">Last 30 days</div>
-          <canvas id="cityBarChart" height="130"></canvas>
-        </div>
-        <div class="panel">
-          <div class="panel-title">City-wise Product Mix</div>
-          <div class="panel-sub">Premium vs Mid-range vs Entry by city</div>
-          <canvas id="cityMixChart" height="200"></canvas>
-        </div>
-      </div>
-    </div>
+      { country: "Brazil", visits: 1300000, impressions: 4300000, ctr: 5.0, cvr: 1.5, units: 19500, revenue: 16.3 },
 
-    <!-- PAGE 5: ROOT CAUSE ANALYSIS -->
-    <div class="page" id="page-rca">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Root Cause Analysis</div>
-          <div class="section-desc">Why sales are falling & how to fix — Search · Merch · Recommendations</div>
-        </div>
-      </div>
+      { country: "Mexico", visits: 850000, impressions: 2800000, ctr: 4.9, cvr: 1.4, units: 11900, revenue: 9.9 },
 
-      <div class="insight-row">
-        <div class="insight-pill" style="border-left:3px solid var(--danger)">
-          <div class="i-icon">🔴</div>
-          <div class="i-text"><strong>PDP-to-Cart dropped 1.8%</strong><span>Poor image quality & missing specs on HP Pavilion 14</span></div>
-        </div>
-        <div class="insight-pill" style="border-left:3px solid var(--warning)">
-          <div class="i-icon">🟡</div>
-          <div class="i-text"><strong>Search rank fell from #2 to #5</strong><span>"budget laptop" keyword — HP Pavilion 15</span></div>
-        </div>
-        <div class="insight-pill" style="border-left:3px solid var(--success)">
-          <div class="i-icon">🟢</div>
-          <div class="i-text"><strong>Recommendation CTR up 22%</strong><span>"Frequently Bought Together" driving upsell</span></div>
-        </div>
-      </div>
+      { country: "Other Countries", visits: 18000000, impressions: 60000000, ctr: 5.3, cvr: 1.4, units: 252000, revenue: 190.0 }
 
-      <div class="rca-grid">
-        <div class="rca-card">
-          <div class="rca-card-header">
-            <div class="rca-icon" style="background:#E3F4FD">🔎</div>
-            <div class="rca-card-title">Search Metrics</div>
-          </div>
-          <div class="metric-row"><span class="metric-name">Search Rank (Flipkart)</span><span class="metric-val">4.2 <span class="metric-trend trend-down">▼1.8</span></span></div>
-          <div class="metric-row"><span class="metric-name">Search Rank (Amazon)</span><span class="metric-val">3.1 <span class="metric-trend trend-down">▼0.9</span></span></div>
-          <div class="metric-row"><span class="metric-name">Keyword Coverage</span><span class="metric-val">68% <span class="metric-trend trend-up">▲4%</span></span></div>
-          <div class="metric-row"><span class="metric-name">Search CTR</span><span class="metric-val">3.2% <span class="metric-trend trend-down">▼0.4%</span></span></div>
-          <div class="metric-row"><span class="metric-name">Paid Search ROAS</span><span class="metric-val">4.8x <span class="metric-trend trend-up">▲0.3x</span></span></div>
-          <div class="metric-row"><span class="metric-name">Organic Share</span><span class="metric-val">61% <span class="metric-trend trend-down">▼3%</span></span></div>
-        </div>
-        <div class="rca-card">
-          <div class="rca-card-header">
-            <div class="rca-icon" style="background:#FFF3E0">🛍️</div>
-            <div class="rca-card-title">Merchandising Metrics</div>
-          </div>
-          <div class="metric-row"><span class="metric-name">Image Quality Score</span><span class="metric-val">6.4/10 <span class="metric-trend trend-down">▼1.2</span></span></div>
-          <div class="metric-row"><span class="metric-name">Specs Completeness</span><span class="metric-val">74% <span class="metric-trend trend-down">▼6%</span></span></div>
-          <div class="metric-row"><span class="metric-name">Reviews (Avg Rating)</span><span class="metric-val">4.1★ <span class="metric-trend trend-up">▲0.1</span></span></div>
-          <div class="metric-row"><span class="metric-name">Review Count</span><span class="metric-val">2,840 <span class="metric-trend trend-up">▲120</span></span></div>
-          <div class="metric-row"><span class="metric-name">Content Score (A+)</span><span class="metric-val">62% <span class="metric-trend trend-down">▼8%</span></span></div>
-          <div class="metric-row"><span class="metric-name">Price Competitiveness</span><span class="metric-val">+2.1% <span class="metric-trend trend-down">vs Lenovo</span></span></div>
-        </div>
-        <div class="rca-card">
-          <div class="rca-card-header">
-            <div class="rca-icon" style="background:#E8F5E9">🤖</div>
-            <div class="rca-card-title">Recommendation Metrics</div>
-          </div>
-          <div class="metric-row"><span class="metric-name">Rec Impression Share</span><span class="metric-val">18.4% <span class="metric-trend trend-up">▲3.2%</span></span></div>
-          <div class="metric-row"><span class="metric-name">Rec CTR</span><span class="metric-val">5.6% <span class="metric-trend trend-up">▲1.1%</span></span></div>
-          <div class="metric-row"><span class="metric-name">Cross-sell Rate</span><span class="metric-val">8.2% <span class="metric-trend trend-up">▲2%</span></span></div>
-          <div class="metric-row"><span class="metric-name">Upsell Conversion</span><span class="metric-val">4.1% <span class="metric-trend trend-up">▲0.8%</span></span></div>
-          <div class="metric-row"><span class="metric-name">"Also Viewed" Rank</span><span class="metric-val">#2.4 <span class="metric-trend trend-up">▲0.6</span></span></div>
-          <div class="metric-row"><span class="metric-name">Bundles Attach Rate</span><span class="metric-val">12.3% <span class="metric-trend trend-up">▲1.4%</span></span></div>
-        </div>
-      </div>
+    ];
 
-      <div class="chart-grid-2">
-        <div class="panel">
-          <div class="panel-title">Sales Drop — Cause Attribution</div>
-          <div class="panel-sub">% contribution to sales decline</div>
-          <canvas id="rcaPieChart" height="200"></canvas>
-        </div>
-        <div class="panel">
-          <div class="panel-title">Metrics Heatmap vs Target</div>
-          <div class="panel-sub">Search · Merch · Rec — vs goal</div>
-          <canvas id="rcaBarChart" height="200"></canvas>
-        </div>
-      </div>
+    const totalVisits = data.reduce((sum, item) => sum + item.visits, 0);
 
-      <div class="panel">
-        <div class="panel-title">🛠️ Recommended Actions</div>
-        <div class="panel-sub">Priority fixes to recover sales</div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>#</th><th>Issue</th><th>Root Cause</th><th>Fix</th><th>Est. Impact</th><th>Priority</th></tr></thead>
-            <tbody>
-              <tr><td>1</td><td>Low PDP-to-Cart</td><td>Missing specs, poor images</td><td>Upload HD images + complete spec sheet</td><td>+1.5% CVR</td><td><span class="badge badge-red">High</span></td></tr>
-              <tr><td>2</td><td>Search rank fell</td><td>Low keyword bid + thin content</td><td>Increase keyword coverage + bid ₹15 more</td><td>+8% traffic</td><td><span class="badge badge-red">High</span></td></tr>
-              <tr><td>3</td><td>Cart abandonment</td><td>No EMI highlight</td><td>Add EMI widget on PDP</td><td>+0.8% CVR</td><td><span class="badge badge-yellow">Medium</span></td></tr>
-              <tr><td>4</td><td>Price perception</td><td>HP priced 2% above Lenovo</td><td>Promo discount or cashback offer</td><td>+5% units</td><td><span class="badge badge-yellow">Medium</span></td></tr>
-              <tr><td>5</td><td>Low rec visibility</td><td>Not in "Similar Items"</td><td>Backend catalogue tagging fix</td><td>+3% exposure</td><td><span class="badge badge-blue">Low</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    const filter = document.getElementById("countryFilter");
+    const tableBody = document.getElementById("tableBody");
 
-    <!-- PAGE 6: PROMOS & AVAILABILITY -->
-    <div class="page" id="page-promo">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Promotions & Availability</div>
-          <div class="section-desc">Promo effectiveness · Stock health · OOS impact</div>
-        </div>
-      </div>
+    function renderDashboard(selected = "Select Country") {
 
-      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="kpi-card" style="--accent-color:#0096D6"><div class="kpi-label">Active Promos</div><div class="kpi-value">7</div><div class="kpi-change up">▲ 2 new this week</div></div>
-        <div class="kpi-card" style="--accent-color:#FF4757"><div class="kpi-label">OOS SKUs</div><div class="kpi-value">4</div><div class="kpi-change down">▼ Est. ₹6Cr revenue loss</div></div>
-        <div class="kpi-card" style="--accent-color:#00C896"><div class="kpi-label">Promo Revenue Lift</div><div class="kpi-value">+18%</div><div class="kpi-change up">vs non-promo period</div></div>
-        <div class="kpi-card" style="--accent-color:#FFB800"><div class="kpi-label">Avg Discount Depth</div><div class="kpi-value">8.4%</div><div class="kpi-change">Healthy range 6-10%</div></div>
-      </div>
+      let filteredData =
+        selected === "All Countries" || selected === "Select Country"
+          ? data
+          : data.filter(d => d.country === selected);
 
-      <div class="chart-grid-2">
-        <div class="panel">
-          <div class="panel-title">Promo vs Non-Promo Sales</div>
-          <div class="panel-sub">Units sold comparison — daily</div>
-          <canvas id="promoChart" height="180"></canvas>
-        </div>
-        <div class="panel">
-          <div class="panel-title">Discount Depth vs Conversion</div>
-          <div class="panel-sub">Sweet spot analysis</div>
-          <canvas id="discountChart" height="180"></canvas>
-        </div>
-      </div>
+      let revenue = 0;
+      let units = 0;
+      let impressions = 0;
+      let ctr = 0;
+      let cvr = 0;
 
-      <div class="panel">
-        <div class="panel-title">SKU Availability Health</div>
-        <div class="panel-sub">Real-time stock levels & OOS risk</div>
-        <div class="avail-grid" id="availGrid"></div>
-      </div>
-    </div>
+      tableBody.innerHTML = "";
 
-  </div><!-- /content -->
-</div><!-- /main -->
+      filteredData.forEach(item => {
 
-<script>
-// ---- NAVIGATION ----
-function showPage(id, el) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  el.classList.add('active');
-  const titles = {overview:'KPI Overview',funnel:'Digital Funnel',sku:'Sales by SKU',city:'City-wise Sales',rca:'Root Cause Analysis',promo:'Promotions & Availability'};
-  document.querySelector('.topbar-title').innerHTML = '<span>HP Laptop</span> — '+titles[id];
-}
+        revenue += item.revenue;
+        units += item.units;
+        impressions += item.impressions;
+        ctr += item.ctr;
+        cvr += item.cvr;
 
-const HP_BLUE='#0096D6', HP_DARK='#00568B', SUCCESS='#00C896', WARNING='#FFB800', DANGER='#FF4757', ACCENT='#00D4FF';
-const chartDefaults = { responsive:true, plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}}} };
+        const trafficShare =
+          ((item.visits / totalVisits) * 100).toFixed(2);
 
-// ---- PAGE 1: KPI CHARTS ----
-new Chart('revChart',{type:'bar',data:{labels:['Nov','Dec','Jan','Feb','Mar','Apr'],datasets:[
-  {label:'Revenue (₹Cr)',data:[210,248,195,264,271,284],backgroundColor:HP_BLUE+'33',borderColor:HP_BLUE,borderWidth:2,borderRadius:6,yAxisID:'y'},
-  {label:'Units',type:'line',data:[32000,38000,28000,40000,43000,45520],borderColor:ACCENT,backgroundColor:ACCENT+'22',pointBackgroundColor:ACCENT,tension:0.4,yAxisID:'y1'}
-]},options:{...chartDefaults,scales:{y:{position:'left',grid:{color:'#F0F4F8'}},y1:{position:'right',grid:{display:false}}}}});
+        const aov =
+          ((item.revenue * 1000000) / item.units).toFixed(0);
 
-new Chart('mixChart',{type:'doughnut',data:{labels:['Premium (₹80K+)','Mid-range (₹50–80K)','Entry (<₹50K)'],datasets:[{data:[28,45,27],backgroundColor:[HP_DARK,HP_BLUE,ACCENT],borderWidth:0,hoverOffset:6}]},options:{...chartDefaults,cutout:'65%'}});
+        tableBody.innerHTML += `
 
-new Chart('trafficChart',{type:'doughnut',data:{labels:['Organic Search','Paid Search','Direct','Social','Referral'],datasets:[{data:[38,28,14,12,8],backgroundColor:[HP_BLUE,'#00568B',ACCENT,SUCCESS,WARNING],borderWidth:0}]},options:{...chartDefaults,cutout:'55%'}});
+          <tr class="border-b hover:bg-blue-50 transition-all duration-200">
 
-new Chart('deviceChart',{type:'bar',data:{labels:['Mobile','Desktop','Tablet'],datasets:[{label:'Conv%',data:[2.1,4.2,2.8],backgroundColor:[HP_BLUE,SUCCESS,WARNING],borderRadius:8}]},options:{...chartDefaults,plugins:{legend:{display:false}}}});
+            <td class="py-4 font-semibold text-gray-800">${item.country}</td>
 
-new Chart('convChart',{type:'line',data:{labels:['W1','W2','W3','W4','W5','W6','W7','W8'],datasets:[{label:'Conv%',data:[3.1,3.4,2.9,2.8,3.2,2.6,2.8,2.8],borderColor:HP_BLUE,backgroundColor:HP_BLUE+'22',tension:0.4,pointBackgroundColor:HP_BLUE,fill:true}]},options:{...chartDefaults}});
+            <td class="py-4">${(item.visits / 1000000).toFixed(2)} Mn</td>
 
-// ---- PAGE 2: FUNNEL ----
-const funnelData=[
-  {label:'Impressions',val:'42,00,000',pct:'100%',color:HP_DARK,w:100},
-  {label:'PDP Views',val:'13,44,000',pct:'32%',color:HP_BLUE,w:32},
-  {label:'Add to Cart',val:'1,12,896',pct:'8.4%',color:'#0AB5E8',w:8.4},
-  {label:'Checkout',val:'60,964',pct:'54%',color:SUCCESS,w:4.6},
-  {label:'Purchase',val:'43,284',pct:'71%',color:'#00A870',w:3.3}
-];
-const fw=document.getElementById('funnelViz');
-funnelData.forEach((s,i)=>{
-  const div=document.createElement('div');
-  div.innerHTML=`<div class="funnel-step-label">${s.label}</div>
-    <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${Math.max(s.w,8)}%;background:${s.color}"><span class="funnel-bar-label">${s.pct}</span></div></div>
-    <div class="funnel-meta"><div class="val">${s.val}</div><div class="pct">${s.pct} of top</div></div>`;
-  div.className='funnel-step'; fw.appendChild(div);
-  if(i<funnelData.length-1){const c=document.createElement('div');c.className='funnel-connector';fw.appendChild(c);}
-});
+            <td class="py-4">${(item.impressions / 1000000).toFixed(2)} Mn</td>
 
-new Chart('dropoffChart',{type:'bar',data:{labels:['Imp→PDP','PDP→Cart','Cart→Checkout','Checkout→Buy'],datasets:[
-  {label:'Drop-off %',data:[68,91.6,46,29],backgroundColor:[WARNING,DANGER,WARNING,SUCCESS],borderRadius:8}
-]},options:{...chartDefaults,indexAxis:'y',plugins:{legend:{display:false}}}});
+            <td class="py-4 text-pink-600 font-semibold">${item.ctr}%</td>
 
-new Chart('channelFunnelChart',{type:'bar',data:{labels:['Amazon','Flipkart','HP.com'],datasets:[
-  {label:'PDP CTR%',data:[3.8,2.9,2.1],backgroundColor:HP_BLUE+'AA',borderRadius:4},
-  {label:'Cart Rate%',data:[9.2,8.1,7.4],backgroundColor:SUCCESS+'AA',borderRadius:4},
-  {label:'Purchase%',data:[0.18,0.13,0.09],backgroundColor:WARNING+'AA',borderRadius:4}
-]},options:{...chartDefaults,scales:{x:{stacked:false}}}});
+            <td class="py-4 text-orange-600 font-semibold">${item.cvr}%</td>
 
-new Chart('convTimeChart',{type:'line',data:{labels:['W1','W2','W3','W4','W5','W6','W7','W8'],datasets:[
-  {label:'HP',data:[0.14,0.15,0.12,0.13,0.14,0.12,0.13,0.13],borderColor:HP_BLUE,tension:0.4,pointBackgroundColor:HP_BLUE},
-  {label:'Industry Avg',data:[0.10,0.10,0.10,0.10,0.10,0.10,0.10,0.10],borderColor:'#ccc',borderDash:[5,5],tension:0}
-]},options:{...chartDefaults}});
+            <td class="py-4">${Intl.NumberFormat().format(item.units)}</td>
 
-// ---- PAGE 3: SKU ----
-const skus=[
-  {name:'HP Pavilion 15',cat:'Mid-range',units:8420,rev:52.4,asp:62200,conv:3.1,avail:92,mom:'+8%',status:'up'},
-  {name:'HP Laptop 15s',cat:'Entry',units:7280,rev:28.6,asp:39300,conv:4.2,avail:88,mom:'+3%',status:'up'},
-  {name:'HP Envy 13',cat:'Premium',units:3140,rev:35.4,asp:112700,conv:2.1,avail:78,mom:'+12%',status:'up'},
-  {name:'HP Spectre x360',cat:'Premium',units:1820,rev:25.5,asp:140100,conv:1.8,avail:74,mom:'+5%',status:'up'},
-  {name:'HP Pavilion 14',cat:'Mid-range',units:5640,rev:33.8,asp:59900,conv:2.4,avail:81,mom:'-4%',status:'down'},
-  {name:'HP Omen 16',cat:'Gaming',units:2340,rev:28.1,asp:120100,conv:2.8,avail:69,mom:'-2%',status:'down'},
-  {name:'HP ProBook 440',cat:'Business',units:1960,rev:17.6,asp:89800,conv:1.6,avail:85,mom:'+1%',status:'up'},
-  {name:'HP EliteBook 840',cat:'Business',units:980,rev:14.2,asp:144900,conv:1.2,avail:91,mom:'+6%',status:'up'},
-];
-const tbody=document.getElementById('skuTableBody');
-skus.forEach(s=>{
-  tbody.innerHTML+=`<tr>
-    <td><strong>${s.name}</strong></td>
-    <td><span class="badge ${s.cat==='Premium'?'badge-blue':s.cat==='Entry'?'badge-green':s.cat==='Gaming'?'badge-red':'badge-yellow'}">${s.cat}</span></td>
-    <td>${s.units.toLocaleString()}</td><td>₹${s.rev}Cr</td><td>₹${s.asp.toLocaleString()}</td>
-    <td>${s.conv}%</td>
-    <td>${s.avail}%<div class="progress-mini"><div class="progress-fill" style="width:${s.avail}%;background:${s.avail>85?SUCCESS:s.avail>70?WARNING:DANGER}"></div></div></td>
-    <td class="${s.status==='up'?'trend-up':'trend-down'}">${s.mom}</td>
-  </tr>`;
-});
-new Chart('skuBarChart',{type:'bar',data:{labels:skus.map(s=>s.name.replace('HP ','')),datasets:[{label:'Revenue ₹Cr',data:skus.map(s=>s.rev),backgroundColor:skus.map((_,i)=>i===0?HP_BLUE:HP_BLUE+'88'),borderRadius:6}]},options:{...chartDefaults,indexAxis:'y',plugins:{legend:{display:false}}}});
-new Chart('skuPieChart',{type:'pie',data:{labels:skus.map(s=>s.name.replace('HP ','')),datasets:[{data:skus.map(s=>s.units),backgroundColor:[HP_DARK,HP_BLUE,ACCENT,SUCCESS,WARNING,DANGER,'#A55EEA','#FD9644'],borderWidth:2,borderColor:'#fff'}]},options:{...chartDefaults}});
+            <td class="py-4 text-green-700 font-bold">$${item.revenue}M</td>
 
-// ---- PAGE 4: CITY ----
-const cities=[
-  {name:'Mumbai',units:7840,rev:'₹48.8Cr',pct:95},
-  {name:'Bengaluru',units:7210,rev:'₹53.4Cr',pct:88},
-  {name:'Delhi',units:6980,rev:'₹42.6Cr',pct:85},
-  {name:'Hyderabad',units:4820,rev:'₹29.8Cr',pct:59},
-  {name:'Pune',units:4210,rev:'₹24.9Cr',pct:51},
-  {name:'Chennai',units:3640,rev:'₹22.2Cr',pct:44},
-  {name:'Kolkata',units:2980,rev:'₹17.1Cr',pct:36},
-  {name:'Ahmedabad',units:2140,rev:'₹12.4Cr',pct:26},
-  {name:'Jaipur',units:1680,rev:'₹9.2Cr',pct:20},
-  {name:'Lucknow',units:1420,rev:'₹7.8Cr',pct:17},
-];
-const cg=document.getElementById('cityCards');
-cities.forEach(c=>{
-  cg.innerHTML+=`<div class="city-card"><div class="city-name">${c.name}</div>
-    <div class="city-units">${c.units.toLocaleString()}</div><div class="city-rev">${c.rev}</div>
-    <div class="city-bar"><div class="city-bar-fill" style="width:${c.pct}%"></div></div></div>`;
-});
-new Chart('cityBarChart',{type:'bar',data:{labels:cities.map(c=>c.name),datasets:[{label:'Units',data:cities.map(c=>c.units),backgroundColor:cities.map((_,i)=>i<3?HP_BLUE:HP_BLUE+'66'),borderRadius:6}]},options:{...chartDefaults,plugins:{legend:{display:false}}}});
-new Chart('cityMixChart',{type:'bar',data:{labels:cities.slice(0,6).map(c=>c.name),datasets:[
-  {label:'Premium',data:[28,38,22,30,24,20],backgroundColor:HP_DARK,borderRadius:4},
-  {label:'Mid-range',data:[44,40,48,42,46,44],backgroundColor:HP_BLUE,borderRadius:4},
-  {label:'Entry',data:[28,22,30,28,30,36],backgroundColor:ACCENT,borderRadius:4}
-]},options:{...chartDefaults,scales:{x:{stacked:true},y:{stacked:true}}}});
+            <td class="py-4 text-blue-700 font-semibold">${trafficShare}%</td>
 
-// ---- PAGE 5: RCA CHARTS ----
-new Chart('rcaPieChart',{type:'doughnut',data:{labels:['Poor Content/Images','Search Rank Drop','Price vs Competitors','OOS / Availability','Competitor Promo'],datasets:[{data:[32,24,18,16,10],backgroundColor:[DANGER,WARNING,HP_BLUE,ACCENT,SUCCESS],borderWidth:0,hoverOffset:8}]},options:{...chartDefaults,cutout:'60%'}});
-new Chart('rcaBarChart',{type:'bar',data:{labels:['Search Rank','Image Score','Spec Complete','Review Rating','Rec CTR','Price Index'],datasets:[
-  {label:'Actual',data:[65,64,74,82,56,78],backgroundColor:HP_BLUE+'BB',borderRadius:6},
-  {label:'Target',data:[80,80,90,85,65,95],backgroundColor:'#E2ECF4',borderRadius:6}
-]},options:{...chartDefaults,scales:{y:{max:100}}}});
+            <td class="py-4 text-purple-700 font-semibold">$${aov}</td>
 
-// ---- PAGE 6: PROMOS ----
-new Chart('promoChart',{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[
-  {label:'Promo Days',data:[1420,1380,2840,2960,3100,4200,3800],borderColor:HP_BLUE,backgroundColor:HP_BLUE+'22',tension:0.4,fill:true},
-  {label:'Non-Promo',data:[1200,1180,1220,1240,1380,1800,1600],borderColor:'#ccc',tension:0.4,borderDash:[5,5]}
-]},options:{...chartDefaults}});
-new Chart('discountChart',{type:'scatter',data:{datasets:[{label:'SKUs',data:[{x:3,y:1.8},{x:5,y:2.4},{x:7,y:3.1},{x:8,y:3.4},{x:10,y:3.2},{x:12,y:3.0},{x:15,y:2.6},{x:18,y:2.1},{x:20,y:1.8}],backgroundColor:HP_BLUE,pointRadius:8,pointHoverRadius:10}]},options:{...chartDefaults,scales:{x:{title:{display:true,text:'Discount %'}},y:{title:{display:true,text:'Conv%'}}}}});
+          </tr>
 
-const availData=[
-  {sku:'HQ2345',name:'Pavilion 15',stock:1840,pct:92,status:'green'},
-  {sku:'HQ2346',name:'Laptop 15s',stock:2100,pct:88,status:'green'},
-  {sku:'HQ2347',name:'Envy 13',stock:420,pct:41,status:'red'},
-  {sku:'HQ2348',name:'Spectre x360',stock:310,pct:31,status:'red'},
-  {sku:'HQ2349',name:'Pavilion 14',stock:890,pct:70,status:'yellow'},
-  {sku:'HQ2350',name:'Omen 16',stock:560,pct:56,status:'yellow'},
-  {sku:'HQ2351',name:'ProBook 440',stock:740,pct:74,status:'yellow'},
-  {sku:'HQ2352',name:'EliteBook 840',stock:1200,pct:85,status:'green'},
-];
-const ag=document.getElementById('availGrid');
-availData.forEach(a=>{
-  const color=a.status==='green'?SUCCESS:a.status==='yellow'?WARNING:DANGER;
-  ag.innerHTML+=`<div class="avail-card">
-    <div class="avail-sku">${a.sku}</div>
-    <div class="avail-name">${a.name}</div>
-    <div class="avail-stock">
-      <div class="stock-val" style="color:${color}">${a.stock.toLocaleString()}</div>
-      <div class="stock-pct" style="color:${color}">${a.pct}% in stock</div>
-    </div>
-    <div class="progress-mini"><div class="progress-fill" style="width:${a.pct}%;background:${color}"></div></div>
-  </div>`;
-});
-</script>
+        `;
+      });
+
+      document.getElementById("revenue").innerHTML =
+        "$" + revenue.toFixed(1) + "M <span class='text-green-600 text-lg'>(YoY ↑ 12%)</span>";
+
+      document.getElementById("units").innerHTML =
+        Math.round(units / 1000) + "K <span class='text-green-600 text-lg'>(YoY ↑ 9%)</span>";
+
+      document.getElementById("impressions").innerHTML =
+        (impressions / 1000000).toFixed(0) + "M <span class='text-green-600 text-lg'>(YoY ↑ 18%)</span>";
+
+      document.getElementById("ctr").innerHTML =
+        (ctr / filteredData.length).toFixed(2) + "% <span class='text-green-600 text-lg'>(YoY ↑ 2.1%)</span>";
+
+      document.getElementById("cvr").innerHTML =
+        (cvr / filteredData.length).toFixed(2) + "% <span class='text-red-500 text-lg'>(YoY ↓ 0.4%)</span>";
+    }
+
+    filter.innerHTML = `
+      <option selected disabled>Select Country</option>
+      <option>All Countries</option>
+    ` + data.map(d =>
+      `<option>${d.country}</option>`
+    ).join("");
+
+    filter.addEventListener("change", e => {
+      renderDashboard(e.target.value);
+    });
+
+    renderDashboard();
+
+  </script>
+
 </body>
+
 </html>
