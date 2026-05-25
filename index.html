@@ -42,6 +42,7 @@
     }
 
     @keyframes fadeIn {
+
       from {
         opacity: 0;
         transform: translateY(10px);
@@ -51,19 +52,20 @@
         opacity: 1;
         transform: translateY(0px);
       }
+
     }
 
   </style>
 
 </head>
 
-<body class="bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 min-h-screen">
+<body class="bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 h-screen overflow-hidden">
 
-  <div class="flex">
+  <div class="flex h-screen overflow-hidden">
 
     <!-- SIDEBAR -->
 
-    <div class="w-72 min-h-screen bg-white shadow-2xl border-r border-gray-200 p-6">
+    <div class="w-72 h-screen bg-white shadow-2xl border-r border-gray-200 p-6 overflow-y-auto">
 
       <div class="flex items-center gap-4 mb-10">
 
@@ -72,6 +74,7 @@
         </div>
 
         <div>
+
           <h1 class="text-2xl font-black text-gray-800">
             HP Analytics
           </h1>
@@ -79,9 +82,12 @@
           <p class="text-sm text-gray-500">
             Enterprise Dashboard Suite
           </p>
+
         </div>
 
       </div>
+
+      <!-- NAVIGATION -->
 
       <div class="space-y-3">
 
@@ -101,9 +107,9 @@
 
       </div>
 
-      <!-- FOOTER -->
+      <!-- FOOTER CARD -->
 
-      <div class="absolute bottom-8 left-6 right-6">
+      <div class="mt-10">
 
         <div class="bg-gradient-to-r from-blue-500 to-indigo-500 rounded-3xl p-5 text-white shadow-xl">
 
@@ -123,7 +129,7 @@
 
     <!-- MAIN CONTENT -->
 
-    <div class="flex-1 p-8">
+    <div class="flex-1 p-8 overflow-y-auto">
 
       <!-- PAGE 1 -->
 
@@ -159,38 +165,63 @@
         <div class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-8">
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">Revenue</p>
+
+            <p class="text-gray-500 text-sm">
+              Revenue
+            </p>
+
             <h2 id="revenue" class="text-3xl font-black mt-3 text-blue-700">
               $579M <span class="text-green-600 text-lg">(YoY ↑ 12%)</span>
             </h2>
+
           </div>
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">Units Sold</p>
+
+            <p class="text-gray-500 text-sm">
+              Units Sold
+            </p>
+
             <h2 id="units" class="text-3xl font-black mt-3 text-green-700">
               751K <span class="text-green-600 text-lg">(YoY ↑ 9%)</span>
             </h2>
+
           </div>
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">Impressions</p>
+
+            <p class="text-gray-500 text-sm">
+              Impressions
+            </p>
+
             <h2 id="impressions" class="text-3xl font-black mt-3 text-purple-700">
               150M <span class="text-green-600 text-lg">(YoY ↑ 18%)</span>
             </h2>
+
           </div>
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">CTR</p>
+
+            <p class="text-gray-500 text-sm">
+              CTR
+            </p>
+
             <h2 id="ctr" class="text-3xl font-black mt-3 text-pink-700">
               5.07% <span class="text-green-600 text-lg">(YoY ↑ 2.1%)</span>
             </h2>
+
           </div>
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">CVR</p>
+
+            <p class="text-gray-500 text-sm">
+              CVR
+            </p>
+
             <h2 id="cvr" class="text-3xl font-black mt-3 text-orange-700">
               1.62% <span class="text-red-500 text-lg">(YoY ↓ 0.4%)</span>
             </h2>
+
           </div>
 
         </div>
@@ -261,110 +292,32 @@
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
             <p class="text-gray-500 text-sm">Visits</p>
-            <h2 class="text-3xl font-black text-blue-700 mt-3">
-              7.46 Mn
-            </h2>
+            <h2 class="text-3xl font-black text-blue-700 mt-3">7.46 Mn</h2>
           </div>
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
             <p class="text-gray-500 text-sm">CTR</p>
-            <h2 class="text-3xl font-black text-pink-700 mt-3">
-              10.24%
-            </h2>
+            <h2 class="text-3xl font-black text-pink-700 mt-3">10.24%</h2>
           </div>
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
             <p class="text-gray-500 text-sm">CVR</p>
-            <h2 class="text-3xl font-black text-orange-700 mt-3">
-              0.65%
-            </h2>
+            <h2 class="text-3xl font-black text-orange-700 mt-3">0.65%</h2>
           </div>
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
             <p class="text-gray-500 text-sm">Revenue</p>
-            <h2 class="text-3xl font-black text-green-700 mt-3">
-              ₹75.7 Cr
-            </h2>
+            <h2 class="text-3xl font-black text-green-700 mt-3">₹75.7 Cr</h2>
           </div>
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
             <p class="text-gray-500 text-sm">Units Sold</p>
-            <h2 class="text-3xl font-black text-indigo-700 mt-3">
-              84.42K
-            </h2>
+            <h2 class="text-3xl font-black text-indigo-700 mt-3">84.42K</h2>
           </div>
 
           <div class="bg-white rounded-3xl shadow-xl p-6">
             <p class="text-gray-500 text-sm">In Stock</p>
-            <h2 class="text-3xl font-black text-red-700 mt-3">
-              74%
-            </h2>
-          </div>
-
-        </div>
-
-        <!-- CATEGORY TABLE -->
-
-        <div class="bg-white rounded-3xl shadow-2xl p-6">
-
-          <h2 class="text-3xl font-black text-gray-800 mb-6">
-            Top Categories
-          </h2>
-
-          <div class="overflow-x-auto">
-
-            <table class="w-full">
-
-              <thead>
-
-                <tr class="border-b text-gray-500">
-
-                  <th class="py-4 text-left">Category</th>
-                  <th class="py-4 text-left">Revenue</th>
-                  <th class="py-4 text-left">ASP</th>
-                  <th class="py-4 text-left">GMV DW</th>
-                  <th class="py-4 text-left">Unit DW</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                <tr class="border-b hover:bg-blue-50">
-
-                  <td class="py-4 font-semibold">Laptop</td>
-                  <td class="py-4 text-green-700 font-bold">₹63.72 Cr</td>
-                  <td class="py-4">₹59,003</td>
-                  <td class="py-4">84.18%</td>
-                  <td class="py-4">12.79%</td>
-
-                </tr>
-
-                <tr class="border-b hover:bg-blue-50">
-
-                  <td class="py-4 font-semibold">Printer</td>
-                  <td class="py-4 text-green-700 font-bold">₹5.19 Cr</td>
-                  <td class="py-4">₹12,008</td>
-                  <td class="py-4">6.86%</td>
-                  <td class="py-4">5.12%</td>
-
-                </tr>
-
-                <tr class="border-b hover:bg-blue-50">
-
-                  <td class="py-4 font-semibold">MobileStorage</td>
-                  <td class="py-4 text-green-700 font-bold">₹3.63 Cr</td>
-                  <td class="py-4">₹783</td>
-                  <td class="py-4">4.80%</td>
-                  <td class="py-4">54.93%</td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
+            <h2 class="text-3xl font-black text-red-700 mt-3">74%</h2>
           </div>
 
         </div>
@@ -376,8 +329,6 @@
   </div>
 
   <script>
-
-    // SIDEBAR NAVIGATION
 
     function showPage(pageId, button) {
 
@@ -395,8 +346,6 @@
       button.classList.add('active');
       button.classList.remove('bg-gray-100', 'text-gray-700');
     }
-
-    // PAGE 1 DATA
 
     const data = [
 
@@ -472,21 +421,6 @@
 
         `;
       });
-
-      document.getElementById("revenue").innerHTML =
-        "$" + revenue.toFixed(1) + "M <span class='text-green-600 text-lg'>(YoY ↑ 12%)</span>";
-
-      document.getElementById("units").innerHTML =
-        Math.round(units / 1000) + "K <span class='text-green-600 text-lg'>(YoY ↑ 9%)</span>";
-
-      document.getElementById("impressions").innerHTML =
-        (impressions / 1000000).toFixed(0) + "M <span class='text-green-600 text-lg'>(YoY ↑ 18%)</span>";
-
-      document.getElementById("ctr").innerHTML =
-        (ctr / filteredData.length).toFixed(2) + "% <span class='text-green-600 text-lg'>(YoY ↑ 2.1%)</span>";
-
-      document.getElementById("cvr").innerHTML =
-        (cvr / filteredData.length).toFixed(2) + "% <span class='text-red-500 text-lg'>(YoY ↓ 0.4%)</span>";
     }
 
     filter.innerHTML = `
