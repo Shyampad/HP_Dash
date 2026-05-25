@@ -1,443 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>HP Analytics Suite</title>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <style>
-
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .sidebar-item.active {
-      background: linear-gradient(to right, #2563eb, #7c3aed);
-      color: white;
-      box-shadow: 0 10px 25px rgba(37,99,235,0.25);
-    }
-
-    .sidebar-item {
-      transition: all 0.25s ease;
-    }
-
-    .sidebar-item:hover {
-      transform: translateX(4px);
-    }
-
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-      animation: fadeIn 0.4s ease;
-    }
-
-    @keyframes fadeIn {
-
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0px);
-      }
-
-    }
-
-  </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HP Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f3f4f6;
+}
+.sidebar{
+  width:260px;
+  height:100vh;
+  position:fixed;
+  left:0;
+  top:0;
+  background:white;
+  padding:20px;
+  box-shadow:0 0 20px rgba(0,0,0,0.1);
+  overflow-y:auto;
+}
+.main{
+  margin-left:280px;
+  padding:25px;
+  height:100vh;
+  overflow-y:auto;
+}
+.menu-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  margin-bottom:12px;
+  cursor:pointer;
+  font-weight:bold;
+  background:#eef2ff;
+}
+.menu-btn.active{
+  background:linear-gradient(to right,#2563eb,#7c3aed);
+  color:white;
+}
+.page{
+  display:none;
+}
+.page.active{
+  display:block;
+}
+.card{
+  background:white;
+  border-radius:24px;
+  padding:24px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.08);
+}
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:18px;
+  margin-bottom:24px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th,td{
+  padding:14px;
+  text-align:left;
+  border-bottom:1px solid #e5e7eb;
+}
+</style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 h-screen overflow-hidden">
+<body>
 
-  <div class="flex h-screen overflow-hidden">
+<div class="sidebar">
 
-    <!-- SIDEBAR -->
+<h1 style="font-size:28px;font-weight:bold;margin-bottom:30px;">
+HP Analytics
+</h1>
 
-    <div class="w-72 h-screen bg-white shadow-2xl border-r border-gray-200 p-6 overflow-y-auto">
+<button class="menu-btn active" onclick="showPage('page1',this)">
+HP E-commerce Dashboard
+</button>
 
-      <div class="flex items-center gap-4 mb-10">
+<button class="menu-btn" onclick="showPage('page2',this)">
+Flipkart Performance Dashboard
+</button>
 
-        <div class="w-14 h-14 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-center text-2xl font-black shadow-xl">
-          HP
-        </div>
+</div>
 
-        <div>
+<div class="main">
 
-          <h1 class="text-2xl font-black text-gray-800">
-            HP Analytics
-          </h1>
+<div id="page1" class="page active">
 
-          <p class="text-sm text-gray-500">
-            Enterprise Dashboard Suite
-          </p>
+<h1 style="font-size:42px;font-weight:bold;">
+HP E-commerce Dashboard
+</h1>
 
-        </div>
+<div class="kpi-grid">
 
-      </div>
+<div class="card">
+<p>Revenue</p>
+<h2>$579M</h2>
+</div>
 
-      <!-- NAVIGATION -->
+<div class="card">
+<p>Units Sold</p>
+<h2>751K</h2>
+</div>
 
-      <div class="space-y-3">
+<div class="card">
+<p>CTR</p>
+<h2>5.07%</h2>
+</div>
 
-        <button onclick="showPage('page1', this)"
-          class="sidebar-item active w-full text-left px-5 py-4 rounded-2xl font-semibold">
+</div>
 
-          🌎 HP E-commerce Dashboard
+<div class="card">
 
-        </button>
+<h2>Country-wise Performance</h2>
 
-        <button onclick="showPage('page2', this)"
-          class="sidebar-item w-full text-left px-5 py-4 rounded-2xl font-semibold text-gray-700 bg-gray-100">
+<table>
 
-          🛒 Flipkart Performance
+<thead>
+<tr>
+<th>Country</th>
+<th>Visits</th>
+<th>Revenue</th>
+</tr>
+</thead>
 
-        </button>
+<tbody>
 
-      </div>
+<tr>
+<td>United States</td>
+<td>13.66 Mn</td>
+<td>$196.8M</td>
+</tr>
 
-      <!-- FOOTER CARD -->
+<tr>
+<td>India</td>
+<td>4.17 Mn</td>
+<td>$40.7M</td>
+</tr>
 
-      <div class="mt-10">
+</tbody>
 
-        <div class="bg-gradient-to-r from-blue-500 to-indigo-500 rounded-3xl p-5 text-white shadow-xl">
+</table>
 
-          <h3 class="font-bold text-lg">
-            April 2026
-          </h3>
+</div>
 
-          <p class="text-sm opacity-90 mt-1">
-            Real-time executive analytics dashboards
-          </p>
+</div>
 
-        </div>
+<div id="page2" class="page">
 
-      </div>
+<h1 style="font-size:42px;font-weight:bold;">
+Flipkart Performance Dashboard
+</h1>
 
-    </div>
+<div class="kpi-grid">
 
-    <!-- MAIN CONTENT -->
+<div class="card">
+<p>Revenue</p>
+<h2>₹75.7 Cr</h2>
+</div>
 
-    <div class="flex-1 p-8 overflow-y-auto">
+<div class="card">
+<p>Units Sold</p>
+<h2>84.42K</h2>
+</div>
 
-      <!-- PAGE 1 -->
+<div class="card">
+<p>CVR</p>
+<h2>0.65%</h2>
+</div>
 
-      <div id="page1" class="page active">
+</div>
 
-        <div class="flex items-center justify-between mb-8">
+</div>
 
-          <div>
+</div>
 
-            <h1 class="text-5xl font-black text-gray-800">
-              HP E-commerce Dashboard
-            </h1>
+<script>
 
-            <p class="text-gray-500 mt-3 text-lg">
-              Estimated Metrics · April 2026
-            </p>
+function showPage(pageId, btn){
 
-          </div>
+document.querySelectorAll('.page').forEach(p=>{
+p.classList.remove('active');
+});
 
-          <div>
+document.querySelectorAll('.menu-btn').forEach(b=>{
+b.classList.remove('active');
+});
 
-            <select id="countryFilter"
-              class="px-5 py-3 rounded-2xl border border-gray-300 bg-white text-gray-800 shadow-xl font-semibold">
+document.getElementById(pageId).classList.add('active');
+btn.classList.add('active');
 
-            </select>
+}
 
-          </div>
-
-        </div>
-
-        <!-- KPI -->
-
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-8">
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-
-            <p class="text-gray-500 text-sm">
-              Revenue
-            </p>
-
-            <h2 id="revenue" class="text-3xl font-black mt-3 text-blue-700">
-              $579M <span class="text-green-600 text-lg">(YoY ↑ 12%)</span>
-            </h2>
-
-          </div>
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-
-            <p class="text-gray-500 text-sm">
-              Units Sold
-            </p>
-
-            <h2 id="units" class="text-3xl font-black mt-3 text-green-700">
-              751K <span class="text-green-600 text-lg">(YoY ↑ 9%)</span>
-            </h2>
-
-          </div>
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-
-            <p class="text-gray-500 text-sm">
-              Impressions
-            </p>
-
-            <h2 id="impressions" class="text-3xl font-black mt-3 text-purple-700">
-              150M <span class="text-green-600 text-lg">(YoY ↑ 18%)</span>
-            </h2>
-
-          </div>
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-
-            <p class="text-gray-500 text-sm">
-              CTR
-            </p>
-
-            <h2 id="ctr" class="text-3xl font-black mt-3 text-pink-700">
-              5.07% <span class="text-green-600 text-lg">(YoY ↑ 2.1%)</span>
-            </h2>
-
-          </div>
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-
-            <p class="text-gray-500 text-sm">
-              CVR
-            </p>
-
-            <h2 id="cvr" class="text-3xl font-black mt-3 text-orange-700">
-              1.62% <span class="text-red-500 text-lg">(YoY ↓ 0.4%)</span>
-            </h2>
-
-          </div>
-
-        </div>
-
-        <!-- TABLE -->
-
-        <div class="bg-white rounded-3xl shadow-2xl p-6">
-
-          <h2 class="text-3xl font-black text-gray-800 mb-6">
-            Country-wise Performance
-          </h2>
-
-          <div class="overflow-x-auto">
-
-            <table class="w-full">
-
-              <thead>
-
-                <tr class="border-b text-gray-500">
-
-                  <th class="py-4 text-left">Country</th>
-                  <th class="py-4 text-left">Visits</th>
-                  <th class="py-4 text-left">Impressions</th>
-                  <th class="py-4 text-left">CTR</th>
-                  <th class="py-4 text-left">CVR</th>
-                  <th class="py-4 text-left">Units</th>
-                  <th class="py-4 text-left">Revenue</th>
-                  <th class="py-4 text-left">Traffic Share</th>
-                  <th class="py-4 text-left">AOV</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody id="tableBody"></tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- PAGE 2 -->
-
-      <div id="page2" class="page">
-
-        <div class="flex items-center justify-between mb-8">
-
-          <div>
-
-            <h1 class="text-5xl font-black text-gray-800">
-              Flipkart Performance Dashboard
-            </h1>
-
-            <p class="text-gray-500 mt-3 text-lg">
-              HP Brand Analytics · April 2026
-            </p>
-
-          </div>
-
-        </div>
-
-        <!-- KPI -->
-
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-5 mb-8">
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">Visits</p>
-            <h2 class="text-3xl font-black text-blue-700 mt-3">7.46 Mn</h2>
-          </div>
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">CTR</p>
-            <h2 class="text-3xl font-black text-pink-700 mt-3">10.24%</h2>
-          </div>
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">CVR</p>
-            <h2 class="text-3xl font-black text-orange-700 mt-3">0.65%</h2>
-          </div>
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">Revenue</p>
-            <h2 class="text-3xl font-black text-green-700 mt-3">₹75.7 Cr</h2>
-          </div>
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">Units Sold</p>
-            <h2 class="text-3xl font-black text-indigo-700 mt-3">84.42K</h2>
-          </div>
-
-          <div class="bg-white rounded-3xl shadow-xl p-6">
-            <p class="text-gray-500 text-sm">In Stock</p>
-            <h2 class="text-3xl font-black text-red-700 mt-3">74%</h2>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <script>
-
-    function showPage(pageId, button) {
-
-      document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-      });
-
-      document.querySelectorAll('.sidebar-item').forEach(btn => {
-        btn.classList.remove('active');
-        btn.classList.add('bg-gray-100', 'text-gray-700');
-      });
-
-      document.getElementById(pageId).classList.add('active');
-
-      button.classList.add('active');
-      button.classList.remove('bg-gray-100', 'text-gray-700');
-    }
-
-    const data = [
-
-      { country: "United States", visits: 13664700, impressions: 42000000, ctr: 5.2, cvr: 1.8, units: 245965, revenue: 196.8 },
-
-      { country: "India", visits: 4174120, impressions: 14000000, ctr: 4.8, cvr: 1.5, units: 62612, revenue: 40.7 },
-
-      { country: "Japan", visits: 2790780, impressions: 9000000, ctr: 5.1, cvr: 1.6, units: 44652, revenue: 33.5 },
-
-      { country: "Germany", visits: 1908720, impressions: 6200000, ctr: 4.9, cvr: 1.7, units: 32448, revenue: 25.9 },
-
-      { country: "Other Countries", visits: 18000000, impressions: 60000000, ctr: 5.3, cvr: 1.4, units: 252000, revenue: 190.0 }
-
-    ];
-
-    const totalVisits = data.reduce((sum, item) => sum + item.visits, 0);
-
-    const filter = document.getElementById("countryFilter");
-    const tableBody = document.getElementById("tableBody");
-
-    function renderDashboard(selected = "Select Country") {
-
-      let filteredData =
-        selected === "All Countries" || selected === "Select Country"
-          ? data
-          : data.filter(d => d.country === selected);
-
-      let revenue = 0;
-      let units = 0;
-      let impressions = 0;
-      let ctr = 0;
-      let cvr = 0;
-
-      tableBody.innerHTML = "";
-
-      filteredData.forEach(item => {
-
-        revenue += item.revenue;
-        units += item.units;
-        impressions += item.impressions;
-        ctr += item.ctr;
-        cvr += item.cvr;
-
-        const trafficShare =
-          ((item.visits / totalVisits) * 100).toFixed(2);
-
-        const aov =
-          ((item.revenue * 1000000) / item.units).toFixed(0);
-
-        tableBody.innerHTML += `
-
-          <tr class="border-b hover:bg-blue-50">
-
-            <td class="py-4 font-semibold">${item.country}</td>
-
-            <td class="py-4">${(item.visits / 1000000).toFixed(2)} Mn</td>
-
-            <td class="py-4">${(item.impressions / 1000000).toFixed(2)} Mn</td>
-
-            <td class="py-4 text-pink-600 font-semibold">${item.ctr}%</td>
-
-            <td class="py-4 text-orange-600 font-semibold">${item.cvr}%</td>
-
-            <td class="py-4">${Intl.NumberFormat().format(item.units)}</td>
-
-            <td class="py-4 text-green-700 font-bold">$${item.revenue}M</td>
-
-            <td class="py-4 text-blue-700 font-semibold">${trafficShare}%</td>
-
-            <td class="py-4 text-purple-700 font-semibold">$${aov}</td>
-
-          </tr>
-
-        `;
-      });
-    }
-
-    filter.innerHTML = `
-      <option selected disabled>Select Country</option>
-      <option>All Countries</option>
-    ` + data.map(d =>
-      `<option>${d.country}</option>`
-    ).join("");
-
-    filter.addEventListener("change", e => {
-      renderDashboard(e.target.value);
-    });
-
-    renderDashboard();
-
-  </script>
+</script>
 
 </body>
-
 </html>
