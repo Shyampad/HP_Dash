@@ -1,205 +1,646 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HP Analytics Dashboard</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f3f4f6;
-}
-.sidebar{
-  width:260px;
-  height:100vh;
-  position:fixed;
-  left:0;
-  top:0;
-  background:white;
-  padding:20px;
-  box-shadow:0 0 20px rgba(0,0,0,0.1);
-  overflow-y:auto;
-}
-.main{
-  margin-left:280px;
-  padding:25px;
-  height:100vh;
-  overflow-y:auto;
-}
-.menu-btn{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  margin-bottom:12px;
-  cursor:pointer;
-  font-weight:bold;
-  background:#eef2ff;
-}
-.menu-btn.active{
-  background:linear-gradient(to right,#2563eb,#7c3aed);
-  color:white;
-}
-.page{
-  display:none;
-}
-.page.active{
-  display:block;
-}
-.card{
-  background:white;
-  border-radius:24px;
-  padding:24px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.08);
-}
-.kpi-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:18px;
-  margin-bottom:24px;
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-}
-th,td{
-  padding:14px;
-  text-align:left;
-  border-bottom:1px solid #e5e7eb;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HP Combined Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================
+       SIDEBAR & LAYOUT STYLES
+       ========================================= */
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-color: #f3f4f6; /* Default fallback */
+    }
+
+    .sidebar {
+      width: 260px;
+      background-color: #0f172a; /* Slate 900 */
+      color: white;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding-top: 30px;
+      z-index: 100;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .sidebar h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      padding: 0 24px;
+      margin-bottom: 30px;
+      letter-spacing: 1px;
+      color: #38bdf8; /* Sky 400 */
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      color: #94a3b8; /* Slate 400 */
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+    }
+
+    .sidebar a:hover {
+      background-color: #1e293b; /* Slate 800 */
+      color: #f8fafc;
+    }
+
+    .sidebar a.active {
+      background-color: #1e293b; /* Slate 800 */
+      color: #ffffff;
+      border-left: 4px solid #38bdf8;
+    }
+
+    .main-content {
+      margin-left: 260px;
+      min-height: 100vh;
+    }
+
+    /* =========================================
+       VIEW 2 (FLIPKART DASHBOARD) CUSTOM CSS
+       ========================================= */
+    :root {
+      --bg: #f0f4f9;
+      --surface: #ffffff;
+      --surface2: #f5f7fb;
+      --border: #dde3ed;
+      --accent: #0070e0;
+      --accent2: #00b49a;
+      --accent3: #e84055;
+      --accent4: #e0a400;
+      --text: #1a2035;
+      --muted: #9aa3b8;
+      --muted2: #6b7591;
+      --glow: rgba(0,112,224,0.12);
+    }
+
+    #view2 *, #view2 *::before, #view2 *::after { 
+      box-sizing: border-box; 
+    }
+
+    #view2 {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      position: relative;
+      padding: 1px 0; /* Prevent margin collapse */
+    }
+
+    /* Subtle background grid scoped to View 2 */
+    #view2::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,112,224,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,112,224,0.05) 1px, transparent 1px);
+      background-size: 48px 48px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #view2 .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    #view2 header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; animation: slideDown 0.6s ease both; }
+    #view2 .header-left { display: flex; align-items: center; gap: 18px; }
+    #view2 .hp-badge { background: linear-gradient(135deg, #0096ff, #004ccc); color: #fff; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(0,112,224,0.35); letter-spacing: -1px; }
+    #view2 .header-title h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); margin: 0;}
+    #view2 .header-title p { font-size: 11px; color: var(--muted2); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px; margin-bottom: 0;}
+
+    /* KPI Cards */
+    #view2 .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 24px; }
+    #view2 .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 18px; position: relative; overflow: hidden; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; animation: fadeUp 0.5s ease both; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    #view2 .kpi-card:hover { transform: translateY(-3px); border-color: rgba(0,112,224,0.3); box-shadow: 0 6px 20px rgba(0,112,224,0.1); }
+    #view2 .kpi-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 16px 16px 0 0; }
+    #view2 .kpi-card.blue::after   { background: linear-gradient(90deg, var(--accent), transparent); }
+    #view2 .kpi-card.teal::after   { background: linear-gradient(90deg, var(--accent2), transparent); }
+    #view2 .kpi-card.red::after    { background: linear-gradient(90deg, var(--accent3), transparent); }
+    #view2 .kpi-card.yellow::after { background: linear-gradient(90deg, var(--accent4), transparent); }
+    #view2 .kpi-card.purple::after { background: linear-gradient(90deg, #b06aff, transparent); }
+    #view2 .kpi-card.green::after  { background: linear-gradient(90deg, #3ddc84, transparent); }
+    #view2 .kpi-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted2); margin-bottom: 12px; }
+    #view2 .kpi-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 700; line-height: 1; color: var(--text); letter-spacing: -0.5px; }
+    #view2 .kpi-value.big { font-size: 24px; }
+    #view2 .kpi-sub { font-size: 10px; color: var(--accent2); margin-top: 7px; display: flex; align-items: center; gap: 4px; }
+    #view2 .kpi-sub.up::before { content: '▲'; color: #3ddc84; font-size: 9px; }
+    #view2 .kpi-sub.neutral { color: var(--muted2); }
+
+    /* Layout & Sections */
+    #view2 .main-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; margin-bottom: 20px; }
+    #view2 .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 24px; animation: fadeUp 0.6s ease both; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    #view2 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+    #view2 .section-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+    #view2 .section-tag { font-size: 10px; color: var(--muted2); background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 3px 10px; letter-spacing: 0.05em; }
+
+    /* Tables */
+    #view2 .cat-table { width: 100%; border-collapse: collapse; }
+    #view2 .cat-table thead th { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0 10px 12px 0; font-weight: 400; }
+    #view2 .cat-table thead th:last-child { text-align: right; }
+    #view2 .cat-table tbody tr { border-top: 1px solid var(--border); transition: background 0.15s; }
+    #view2 .cat-table tbody tr:hover { background: rgba(0,0,0,0.02); }
+    #view2 .cat-table tbody td { padding: 13px 10px 13px 0; font-size: 12px; color: var(--text); border:none;}
+    #view2 .cat-table tbody td:last-child { text-align: right; }
+    #view2 .cat-name { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; }
+    
+    #view2 .revenue-bar-wrap { display: flex; align-items: center; gap: 10px; }
+    #view2 .revenue-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; max-width: 100px; }
+    #view2 .revenue-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 1.2s cubic-bezier(0.16,1,0.3,1); }
+    #view2 .pct-chip { font-size: 11px; padding: 3px 9px; border-radius: 100px; font-weight: 500; }
+    #view2 .pct-chip.high  { background: rgba(0,229,195,0.12); color: var(--accent2); }
+    #view2 .pct-chip.mid   { background: rgba(0,150,255,0.12); color: var(--accent); }
+    #view2 .pct-chip.low   { background: rgba(247,201,72,0.12); color: var(--accent4); }
+
+    /* Donut */
+    #view2 .donut-section { display: flex; flex-direction: column; gap: 20px; }
+    #view2 .donut-wrap { display: flex; align-items: center; justify-content: center; position: relative; margin: 8px auto; }
+    #view2 .donut-center { position: absolute; text-align: center; pointer-events: none; }
+    #view2 .donut-center-val { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
+    #view2 .donut-center-label { font-size: 9px; color: var(--muted2); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+    #view2 .legend-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    #view2 .legend-item { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--muted2); }
+    #view2 .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    #view2 .legend-label { flex: 1; }
+
+    /* Top Products Table */
+    #view2 .prod-table { width: 100%; border-collapse: collapse; }
+    #view2 .prod-table thead th { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0 12px 12px 0; font-weight: 400; }
+    #view2 .prod-table tbody tr { border-top: 1px solid var(--border); }
+    #view2 .prod-table tbody tr:hover { background: rgba(0,0,0,0.02); }
+    #view2 .prod-table tbody td { padding: 11px 12px 11px 0; font-size: 11px; color: var(--text); border:none;}
+    #view2 .prod-id { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.03em; }
+    #view2 .stock-pill { display: inline-block; font-size: 10px; padding: 2px 9px; border-radius: 100px; font-weight: 500; }
+    #view2 .stock-pill.ok   { background: rgba(61,220,132,0.12); color: #3ddc84; }
+    #view2 .stock-pill.low  { background: rgba(247,201,72,0.12);  color: var(--accent4); }
+    #view2 .stock-pill.crit { background: rgba(255,95,109,0.12);  color: var(--accent3); }
+
+    /* Animations */
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    
+    #view2 .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+    #view2 .kpi-card:nth-child(2) { animation-delay: 0.10s; }
+    #view2 .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+    #view2 .kpi-card:nth-child(4) { animation-delay: 0.20s; }
+    #view2 .kpi-card:nth-child(5) { animation-delay: 0.25s; }
+    #view2 .kpi-card:nth-child(6) { animation-delay: 0.30s; }
+
+  </style>
 </head>
 
 <body>
 
-<div class="sidebar">
+  <div class="sidebar">
+    <h2>HP Portals</h2>
+    <a id="nav-view1" class="active" onclick="switchView('view1')">
+      Global E-commerce
+    </a>
+    <a id="nav-view2" onclick="switchView('view2')">
+      Flipkart Performance
+    </a>
+  </div>
 
-<h1 style="font-size:28px;font-weight:bold;margin-bottom:30px;">
-HP Analytics
-</h1>
+  <div class="main-content">
 
-<button class="menu-btn active" onclick="showPage('page1',this)">
-HP E-commerce Dashboard
-</button>
+    <div id="view1" class="bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 min-h-screen p-6">
+      <div class="max-w-7xl mx-auto space-y-6">
+        
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 class="text-5xl font-bold text-gray-900">HP E-commerce Dashboard</h1>
+            <p class="text-gray-700 mt-3 text-lg">Estimated Metrics - April 2026</p>
+          </div>
+          <div class="mt-5 md:mt-0">
+            <select id="countryFilter" class="px-5 py-3 rounded-2xl border border-gray-300 bg-white text-gray-800 shadow-xl font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300"></select>
+          </div>
+        </div>
 
-<button class="menu-btn" onclick="showPage('page2',this)">
-Flipkart Performance Dashboard
-</button>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
+          <div class="bg-gradient-to-br from-white to-blue-50 rounded-3xl shadow-2xl p-6 border border-white/50 hover:scale-105 transition-all duration-300">
+            <p class="text-gray-500 font-medium">Estimated Revenue</p>
+            <h2 id="revenue" class="text-3xl font-bold mt-3 text-blue-700">$579M <span class="text-green-600 text-lg">(YoY ↑ 12%)</span></h2>
+          </div>
+          <div class="bg-gradient-to-br from-white to-green-50 rounded-3xl shadow-2xl p-6 border border-white/50 hover:scale-105 transition-all duration-300">
+            <p class="text-gray-500 font-medium">Units Sold</p>
+            <h2 id="units" class="text-3xl font-bold mt-3 text-green-700">751K <span class="text-green-600 text-lg">(YoY ↑ 9%)</span></h2>
+          </div>
+          <div class="bg-gradient-to-br from-white to-purple-50 rounded-3xl shadow-2xl p-6 border border-white/50 hover:scale-105 transition-all duration-300">
+            <p class="text-gray-500 font-medium">Impressions</p>
+            <h2 id="impressions" class="text-3xl font-bold mt-3 text-purple-700">150M <span class="text-green-600 text-lg">(YoY ↑ 18%)</span></h2>
+          </div>
+          <div class="bg-gradient-to-br from-white to-pink-50 rounded-3xl shadow-2xl p-6 border border-white/50 hover:scale-105 transition-all duration-300">
+            <p class="text-gray-500 font-medium">CTR</p>
+            <h2 id="ctr" class="text-3xl font-bold mt-3 text-pink-700">5.07% <span class="text-green-600 text-lg">(YoY ↑ 2.1%)</span></h2>
+          </div>
+          <div class="bg-gradient-to-br from-white to-orange-50 rounded-3xl shadow-2xl p-6 border border-white/50 hover:scale-105 transition-all duration-300">
+            <p class="text-gray-500 font-medium">CVR</p>
+            <h2 id="cvr" class="text-3xl font-bold mt-3 text-orange-700">1.62% <span class="text-red-500 text-lg">(YoY ↓ 0.4%)</span></h2>
+          </div>
+        </div>
 
-</div>
+        <div class="bg-white rounded-3xl shadow-2xl p-6">
+          <h2 class="text-3xl font-bold text-gray-800 mb-6">Country-wise Performance</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b text-gray-600">
+                  <th class="py-4">Country</th>
+                  <th class="py-4">Visits</th>
+                  <th class="py-4">Impressions</th>
+                  <th class="py-4">CTR</th>
+                  <th class="py-4">CVR</th>
+                  <th class="py-4">Units</th>
+                  <th class="py-4">Revenue</th>
+                  <th class="py-4">Revenue YoY</th>
+                  <th class="py-4">Units YoY</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
 
-<div class="main">
+        <div class="bg-white rounded-3xl shadow-2xl p-6">
+          <h2 class="text-3xl font-bold text-gray-800 mb-6">Promotions Active</h2>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-3xl p-5 shadow-lg hover:scale-105 transition-all">
+              <h3 class="text-xl font-bold">Back to School</h3>
+              <p class="text-sm mt-2 opacity-90">Student discounts & laptop offers</p>
+            </div>
+            <div class="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-3xl p-5 shadow-lg hover:scale-105 transition-all">
+              <h3 class="text-xl font-bold">No Cost EMI</h3>
+              <p class="text-sm mt-2 opacity-90">Cashback & EMI offers</p>
+            </div>
+            <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-3xl p-5 shadow-lg hover:scale-105 transition-all">
+              <h3 class="text-xl font-bold">Gaming Week</h3>
+              <p class="text-sm mt-2 opacity-90">OMEN & Victus sale</p>
+            </div>
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-3xl p-5 shadow-lg hover:scale-105 transition-all">
+              <h3 class="text-xl font-bold">Printer Bundles</h3>
+              <p class="text-sm mt-2 opacity-90">Free ink & warranty</p>
+            </div>
+          </div>
+        </div>
 
-<div id="page1" class="page active">
+      </div>
+    </div>
 
-<h1 style="font-size:42px;font-weight:bold;">
-HP E-commerce Dashboard
-</h1>
 
-<div class="kpi-grid">
+    <div id="view2" style="display: none;">
+      <div class="container">
 
-<div class="card">
-<p>Revenue</p>
-<h2>$579M</h2>
-</div>
+        <header>
+          <div class="header-left">
+            <div class="hp-badge">HP</div>
+            <div class="header-title">
+              <h1>HP (Flipkart Performance)</h1>
+              <p>April 2026</p>
+            </div>
+          </div>
+        </header>
 
-<div class="card">
-<p>Units Sold</p>
-<h2>751K</h2>
-</div>
+        <div class="kpi-row">
+          <div class="kpi-card blue">
+            <div class="kpi-label">Visits</div>
+            <div class="kpi-value">7.46<span style="font-size:14px;color:var(--muted2)"> Mn</span></div>
+            <div class="kpi-sub neutral">Monthly Sessions</div>
+          </div>
+          <div class="kpi-card teal">
+            <div class="kpi-label">CTR</div>
+            <div class="kpi-value">10.24<span style="font-size:14px;color:var(--muted2)">%</span></div>
+            <div class="kpi-sub neutral">Click-Through Rate</div>
+          </div>
+          <div class="kpi-card purple">
+            <div class="kpi-label">CVR</div>
+            <div class="kpi-value">0.65<span style="font-size:14px;color:var(--muted2)">%</span></div>
+            <div class="kpi-sub neutral">Conversion Rate</div>
+          </div>
+          <div class="kpi-card yellow">
+            <div class="kpi-label">Revenue</div>
+            <div class="kpi-value big">₹75.7<span style="font-size:14px;color:var(--muted2)"> Cr</span></div>
+            <div class="kpi-sub up">YoY +42.35%</div>
+          </div>
+          <div class="kpi-card green">
+            <div class="kpi-label">Units Sold</div>
+            <div class="kpi-value">84.42<span style="font-size:14px;color:var(--muted2)"> K</span></div>
+            <div class="kpi-sub neutral">Sellout Units</div>
+          </div>
+          <div class="kpi-card red">
+            <div class="kpi-label">In-Stock</div>
+            <div class="kpi-value">74<span style="font-size:14px;color:var(--muted2)">%</span></div>
+            <div class="kpi-sub neutral">Promos Active: 8</div>
+          </div>
+        </div>
 
-<div class="card">
-<p>CTR</p>
-<h2>5.07%</h2>
-</div>
+        <div class="main-grid" style="margin-bottom:20px;">
+          <div class="section-card">
+            <div class="section-header">
+              <span class="section-title">Top 5 Categories</span>
+            </div>
+            <table class="cat-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Revenue (in Cr)</th>
+                  <th>ASP</th>
+                  <th>GMV DW</th>
+                  <th>Unit DW</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cat-name">Laptop</span></td>
+                  <td>
+                    <div class="revenue-bar-wrap">
+                      <div class="revenue-bar-bg"><div class="revenue-bar-fill" style="width:100%" data-target="100%"></div></div>
+                      <span>₹63.72</span>
+                    </div>
+                  </td>
+                  <td style="color:var(--muted2)">₹59,003</td>
+                  <td><span class="pct-chip high">84.18%</span></td>
+                  <td><span class="pct-chip mid">12.79%</span></td>
+                </tr>
+                <tr>
+                  <td><span class="cat-name">Printer</span></td>
+                  <td>
+                    <div class="revenue-bar-wrap">
+                      <div class="revenue-bar-bg"><div class="revenue-bar-fill" style="width:8.2%" data-target="8.2%"></div></div>
+                      <span>₹5.19</span>
+                    </div>
+                  </td>
+                  <td style="color:var(--muted2)">₹12,008</td>
+                  <td><span class="pct-chip mid">6.86%</span></td>
+                  <td><span class="pct-chip mid">5.12%</span></td>
+                </tr>
+                <tr>
+                  <td><span class="cat-name">MobileStorage</span></td>
+                  <td>
+                    <div class="revenue-bar-wrap">
+                      <div class="revenue-bar-bg"><div class="revenue-bar-fill" style="width:5.7%" data-target="5.7%"></div></div>
+                      <span>₹3.63</span>
+                    </div>
+                  </td>
+                  <td style="color:var(--muted2)">₹783</td>
+                  <td><span class="pct-chip low">4.80%</span></td>
+                  <td><span class="pct-chip high">54.93%</span></td>
+                </tr>
+                <tr>
+                  <td><span class="cat-name">AllInOnePC</span></td>
+                  <td>
+                    <div class="revenue-bar-wrap">
+                      <div class="revenue-bar-bg"><div class="revenue-bar-fill" style="width:1.2%" data-target="1.2%"></div></div>
+                      <span>₹0.75</span>
+                    </div>
+                  </td>
+                  <td style="color:var(--muted2)">₹48,053</td>
+                  <td><span class="pct-chip low">0.99%</span></td>
+                  <td><span class="pct-chip low">0.18%</span></td>
+                </tr>
+                <tr>
+                  <td><span class="cat-name">CompStoragePD</span></td>
+                  <td>
+                    <div class="revenue-bar-wrap">
+                      <div class="revenue-bar-bg"><div class="revenue-bar-fill" style="width:0.8%" data-target="0.8%"></div></div>
+                      <span>₹0.49</span>
+                    </div>
+                  </td>
+                  <td style="color:var(--muted2)">₹838</td>
+                  <td><span class="pct-chip low">0.64%</span></td>
+                  <td><span class="pct-chip mid">6.87%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-</div>
+          <div class="section-card">
+            <div class="section-header">
+              <span class="section-title">Revenue (in Cr) Distribution</span>
+              <span class="section-tag">by Category</span>
+            </div>
+            <div class="donut-section">
+              <div class="donut-wrap" style="position:relative;width:200px;height:200px;margin:0 auto 16px;">
+                <canvas id="donutChart" width="200" height="200"></canvas>
+                <div class="donut-center" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+                  <div class="donut-center-val" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;color:#1a2035;line-height:1;">₹73.7</div>
+                  <div class="donut-center-label" style="font-size:10px;color:#6b7591;letter-spacing:0.08em;text-transform:uppercase;margin-top:4px;">Total Cr</div>
+                </div>
+              </div>
+              <div class="legend-list">
+                <div class="legend-item"><div class="legend-dot" style="background:#0070e0;"></div><span class="legend-label">Laptop</span><span style="margin-left:auto;font-size:11px;color:#1a2035;font-weight:600;">₹63.72 Cr</span><span style="font-size:10px;color:#6b7591;margin-left:6px;">84.18%</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#00b49a;"></div><span class="legend-label">Printer</span><span style="margin-left:auto;font-size:11px;color:#1a2035;font-weight:600;">₹5.19 Cr</span><span style="font-size:10px;color:#6b7591;margin-left:6px;">6.86%</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#e0a400;"></div><span class="legend-label">MobileStorage</span><span style="margin-left:auto;font-size:11px;color:#1a2035;font-weight:600;">₹3.63 Cr</span><span style="font-size:10px;color:#6b7591;margin-left:6px;">4.80%</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#b06aff;"></div><span class="legend-label">AllInOnePC</span><span style="margin-left:auto;font-size:11px;color:#1a2035;font-weight:600;">₹0.75 Cr</span><span style="font-size:10px;color:#6b7591;margin-left:6px;">0.99%</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#e84055;"></div><span class="legend-label">CompStorage</span><span style="margin-left:auto;font-size:11px;color:#1a2035;font-weight:600;">₹0.49 Cr</span><span style="font-size:10px;color:#6b7591;margin-left:6px;">0.64%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<div class="card">
+        <div style="margin-bottom:20px;">
+          <div class="section-card">
+            <div class="section-header">
+              <span class="section-title">Top Products · Laptop Vertical</span>
+            </div>
+            <table class="prod-table">
+              <thead>
+                <tr>
+                  <th>Product ID</th>
+                  <th>Revenue DRR</th>
+                  <th>Units DRR</th>
+                  <th>Stocks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="prod-id">COMHDZVEH5XGAYBF</span></td><td style="color:var(--accent2);font-weight:500">₹15.86L</td><td>28</td><td><span class="stock-pill ok">389</span></td></tr>
+                <tr><td><span class="prod-id">COMHBFRJEWGN4FMY</span></td><td style="color:var(--accent2);font-weight:500">₹11.75L</td><td>24</td><td><span class="stock-pill ok">134</span></td></tr>
+                <tr><td><span class="prod-id">COMHEZA8DBZRJXZG</span></td><td style="color:var(--accent);font-weight:500">₹10.90L</td><td>18</td><td><span class="stock-pill ok">542</span></td></tr>
+                <tr><td><span class="prod-id">COMH8Z22GGEQZBVQ</span></td><td style="color:var(--accent);font-weight:500">₹10.19L</td><td>15</td><td><span class="stock-pill low">197</span></td></tr>
+                <tr><td><span class="prod-id">COMH8QXWHJRQKR6P</span></td><td style="color:var(--accent4);font-weight:500">₹9.67L</td><td>17</td><td><span class="stock-pill crit">43</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-<h2>Country-wise Performance</h2>
+      </div>
+    </div>
 
-<table>
+  </div>
 
-<thead>
-<tr>
-<th>Country</th>
-<th>Visits</th>
-<th>Revenue</th>
-</tr>
-</thead>
+  <script>
+    /* ----- NAVIGATION LOGIC ----- */
+    function switchView(viewId) {
+      // Hide all views
+      document.getElementById('view1').style.display = 'none';
+      document.getElementById('view2').style.display = 'none';
+      
+      // Remove active states from sidebar
+      document.getElementById('nav-view1').classList.remove('active');
+      document.getElementById('nav-view2').classList.remove('active');
+      
+      // Show selected view
+      document.getElementById(viewId).style.display = 'block';
+      document.getElementById('nav-' + viewId).classList.add('active');
 
-<tbody>
+      // Re-trigger View 2 Canvas Animations when made visible
+      if(viewId === 'view2') {
+        initDonutChart();
+        animateProgressBars();
+      }
+    }
 
-<tr>
-<td>United States</td>
-<td>13.66 Mn</td>
-<td>$196.8M</td>
-</tr>
 
-<tr>
-<td>India</td>
-<td>4.17 Mn</td>
-<td>$40.7M</td>
-</tr>
+    /* ----- VIEW 1 SCRIPT (GLOBAL DATA) ----- */
+    const globalData = [
+      { country: "United States", visits: 13664700, impressions: 42000000, ctr: 5.2, cvr: 1.8, units: 245965, revenue: 196.8 },
+      { country: "India", visits: 4174120, impressions: 14000000, ctr: 4.8, cvr: 1.5, units: 62612, revenue: 40.7 },
+      { country: "Japan", visits: 2790780, impressions: 9000000, ctr: 5.1, cvr: 1.6, units: 44652, revenue: 33.5 },
+      { country: "United Kingdom", visits: 1976200, impressions: 6500000, ctr: 5.0, cvr: 1.7, units: 33595, revenue: 26.9 },
+      { country: "Germany", visits: 1908720, impressions: 6200000, ctr: 4.9, cvr: 1.7, units: 32448, revenue: 25.9 },
+      { country: "Australia", visits: 1200000, impressions: 4000000, ctr: 5.1, cvr: 1.6, units: 19200, revenue: 15.2 },
+      { country: "Canada", visits: 1450000, impressions: 4800000, ctr: 5.0, cvr: 1.7, units: 24650, revenue: 18.6 },
+      { country: "France", visits: 1100000, impressions: 3600000, ctr: 4.7, cvr: 1.5, units: 16500, revenue: 13.4 },
+      { country: "Italy", visits: 980000, impressions: 3200000, ctr: 4.8, cvr: 1.4, units: 13720, revenue: 11.8 },
+      { country: "Spain", visits: 920000, impressions: 3000000, ctr: 4.9, cvr: 1.5, units: 13800, revenue: 10.9 },
+      { country: "Singapore", visits: 650000, impressions: 2200000, ctr: 5.4, cvr: 1.9, units: 12350, revenue: 9.7 },
+      { country: "Malaysia", visits: 540000, impressions: 1800000, ctr: 5.0, cvr: 1.5, units: 8100, revenue: 6.2 },
+      { country: "Thailand", visits: 510000, impressions: 1700000, ctr: 5.1, cvr: 1.4, units: 7140, revenue: 5.8 },
+      { country: "Saudi Arabia", visits: 600000, impressions: 2100000, ctr: 5.2, cvr: 1.6, units: 9600, revenue: 8.5 },
+      { country: "South Africa", visits: 450000, impressions: 1500000, ctr: 4.8, cvr: 1.3, units: 5850, revenue: 4.7 },
+      { country: "Brazil", visits: 1300000, impressions: 4300000, ctr: 5.0, cvr: 1.5, units: 19500, revenue: 16.3 },
+      { country: "Mexico", visits: 850000, impressions: 2800000, ctr: 4.9, cvr: 1.4, units: 11900, revenue: 9.9 },
+      { country: "Other Countries", visits: 18000000, impressions: 60000000, ctr: 5.3, cvr: 1.4, units: 252000, revenue: 190.0 }
+    ];
 
-</tbody>
+    const filter = document.getElementById("countryFilter");
+    const tableBody = document.getElementById("tableBody");
 
-</table>
+    function renderDashboard(selected = "Select Country") {
+      let filteredData = (selected === "All Countries" || selected === "Select Country") 
+          ? globalData : globalData.filter(d => d.country === selected);
 
-</div>
+      let revenue = 0, units = 0, impressions = 0, ctr = 0, cvr = 0;
+      tableBody.innerHTML = "";
 
-</div>
+      filteredData.forEach(item => {
+        revenue += item.revenue;
+        units += item.units;
+        impressions += item.impressions;
+        ctr += item.ctr;
+        cvr += item.cvr;
 
-<div id="page2" class="page">
+        tableBody.innerHTML += `
+          <tr class="border-b hover:bg-blue-50 transition-all duration-200">
+            <td class="py-4 font-semibold text-gray-800">${item.country}</td>
+            <td class="py-4">${(item.visits / 1000000).toFixed(2)} Mn</td>
+            <td class="py-4">${(item.impressions / 1000000).toFixed(2)} Mn</td>
+            <td class="py-4 text-pink-600 font-semibold">${item.ctr}%</td>
+            <td class="py-4 text-orange-600 font-semibold">${item.cvr}%</td>
+            <td class="py-4">${Intl.NumberFormat().format(item.units)}</td>
+            <td class="py-4 text-green-700 font-bold">$${item.revenue}M</td>
+            <td class="py-4 text-green-600 font-semibold">(YoY ↑ 12%)</td>
+            <td class="py-4 text-green-600 font-semibold">(YoY ↑ 9%)</td>
+          </tr>`;
+      });
 
-<h1 style="font-size:42px;font-weight:bold;">
-Flipkart Performance Dashboard
-</h1>
+      document.getElementById("revenue").innerHTML = "$" + revenue.toFixed(1) + "M <span class='text-green-600 text-lg'>(YoY ↑ 12%)</span>";
+      document.getElementById("units").innerHTML = Math.round(units / 1000) + "K <span class='text-green-600 text-lg'>(YoY ↑ 9%)</span>";
+      document.getElementById("impressions").innerHTML = (impressions / 1000000).toFixed(0) + "M <span class='text-green-600 text-lg'>(YoY ↑ 18%)</span>";
+      document.getElementById("ctr").innerHTML = (ctr / filteredData.length).toFixed(2) + "% <span class='text-green-600 text-lg'>(YoY ↑ 2.1%)</span>";
+      document.getElementById("cvr").innerHTML = (cvr / filteredData.length).toFixed(2) + "% <span class='text-red-500 text-lg'>(YoY ↓ 0.4%)</span>";
+    }
 
-<div class="kpi-grid">
+    filter.innerHTML = `<option selected disabled>Select Country</option><option>All Countries</option>` + 
+                       globalData.map(d => `<option>${d.country}</option>`).join("");
 
-<div class="card">
-<p>Revenue</p>
-<h2>₹75.7 Cr</h2>
-</div>
+    filter.addEventListener("change", e => renderDashboard(e.target.value));
+    renderDashboard();
 
-<div class="card">
-<p>Units Sold</p>
-<h2>84.42K</h2>
-</div>
 
-<div class="card">
-<p>CVR</p>
-<h2>0.65%</h2>
-</div>
+    /* ----- VIEW 2 SCRIPT (FLIPKART ANIMATIONS) ----- */
+    let animationFrameId;
 
-</div>
+    function initDonutChart() {
+      const canvas = document.getElementById('donutChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const cx = 100, cy = 100, r = 78, thickness = 28;
+      const data = [
+        { value: 63.72, color: '#0070e0' },
+        { value: 5.19,  color: '#00b49a' },
+        { value: 3.63,  color: '#e0a400' },
+        { value: 0.75,  color: '#b06aff' },
+        { value: 0.49,  color: '#e84055' },
+      ];
+      const total = data.reduce((s, d) => s + d.value, 0);
+      const gap = 0.03;
+      let startAngle = -Math.PI / 2;
+      let progress = 0;
 
-</div>
+      // Cancel any ongoing animation to prevent overlap
+      if(animationFrameId) cancelAnimationFrame(animationFrameId);
 
-</div>
+      function draw(p) {
+        ctx.clearRect(0, 0, 200, 200);
+        // background ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = '#dde3ed';
+        ctx.lineWidth = thickness;
+        ctx.stroke();
 
-<script>
+        let angle = startAngle;
+        data.forEach(seg => {
+          const slice = (seg.value / total) * Math.PI * 2 * p;
+          if (slice < 0.001) return;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, angle + gap / 2, angle + slice - gap / 2);
+          ctx.strokeStyle = seg.color;
+          ctx.lineWidth = thickness;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+          angle += (seg.value / total) * Math.PI * 2;
+        });
+      }
 
-function showPage(pageId, btn){
+      function animate() {
+        progress += 0.04;
+        if (progress >= 1) { draw(1); return; }
+        draw(progress);
+        animationFrameId = requestAnimationFrame(animate);
+      }
+      setTimeout(animate, 200);
+    }
 
-document.querySelectorAll('.page').forEach(p=>{
-p.classList.remove('active');
-});
-
-document.querySelectorAll('.menu-btn').forEach(b=>{
-b.classList.remove('active');
-});
-
-document.getElementById(pageId).classList.add('active');
-btn.classList.add('active');
-
-}
-
-</script>
-
+    function animateProgressBars() {
+      document.querySelectorAll('#view2 .revenue-bar-fill').forEach(el => {
+        const target = el.getAttribute('data-target');
+        el.style.width = '0%';
+        setTimeout(() => { el.style.width = target; }, 200);
+      });
+    }
+  </script>
 </body>
 </html>
